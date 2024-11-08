@@ -1,6 +1,6 @@
 from database import obtener_conexion
 from database import crear_tablas
-import datetime
+from datetime import datetime
 import unicodedata
 
 class Libro:
@@ -160,7 +160,7 @@ class Prestamo:
         """
         SELECT P.* 
         FROM Prestamo P
-        WHERE P.usuario_id = ? AND P.codigo_ISBN = ?
+        WHERE P.usuario_id = ? AND P.codigo_ISBN = ? AND p.fecha_devolucion_real IS NULL
         """,
         (usuario_id, codigo_ISBN)
         )
@@ -200,26 +200,35 @@ class Prestamo:
                 (self.usuario_id, self.codigo_ISBN, self.fecha_prestamo, self.fecha_devolucion_estimada, None),
             )
 
-            # Los cambios se guardan automáticamente al salir del bloque 'with'
         
+
+
     @staticmethod
     def prestamos_vencidos():
         conexion = obtener_conexion()
         cursor = conexion.cursor()
 
+        fecha_actual = datetime.now().strftime('%Y-%m-%d')
+        print(fecha_actual)
+
         # Obtener los préstamos cuya fecha de devolución sea menor a la fecha actual
         cursor.execute("""
             SELECT p.id, p.usuario_id, p.codigo_ISBN, p.fecha_prestamo, p.fecha_devolucion_estimada
             FROM Prestamo p
-            WHERE p.fecha_devolucion_estimada < DATE('now') AND p.fecha_devolucion_estimada IS NOT NULL
-        """)
+            WHERE p.fecha_devolucion_estimada < ? AND p.fecha_devolucion_estimada IS NOT NULL AND p.fecha_devolucion_real IS NULL
+        """, (fecha_actual,))  
+        
         prestamos_vencidos = cursor.fetchall()
+
+        # Cerrar la conexion
         conexion.close()
 
+        # Procesar y devolver el resultado
         if prestamos_vencidos:
             return "\n".join([f"ID: {p[0]}, Usuario ID: {p[1]}, ISBN: {p[2]}, Fecha Préstamo: {p[3]}, Fecha Devolución: {p[4]}" for p in prestamos_vencidos])
         else:
             return "No hay préstamos vencidos."
+
     
     @staticmethod
     def libros_mas_prestados():
@@ -234,6 +243,7 @@ class Prestamo:
             WHERE p.fecha_prestamo >= DATE('now', '-1 month')
             GROUP BY l.codigo_ISBN
             ORDER BY cantidad DESC
+            LIMIT 10
         """)
         libros_mas_prestados = cursor.fetchall()
         conexion.close()
@@ -255,6 +265,7 @@ class Prestamo:
             JOIN Usuario u ON p.usuario_id = u.id
             GROUP BY p.usuario_id
             ORDER BY cantidad DESC
+            LIMIT 5
         """)
         usuarios_con_mas_prestamos = cursor.fetchall()
         conexion.close()

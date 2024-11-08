@@ -5,6 +5,8 @@ from tkcalendar import Calendar
 from database import obtener_conexion
 from clase import Libro, Autor, Usuario, Prestamo
 
+
+
 class BibliotecaApp:
     def __init__(self, root):
         self.root = root
@@ -24,8 +26,12 @@ class BibliotecaApp:
         tk.Button(button_frame, text="Registrar Usuario", command=self.registrar_usuario).grid(row=2, column=0, pady=5)
         tk.Button(button_frame, text="Préstamo de Libro", command=self.prestamo_libro).grid(row=3, column=0, pady=5)
         tk.Button(button_frame, text="Devolución de Libro", command=self.devolucion_libro).grid(row=4, column=0, pady=5)
-        tk.Button(button_frame, text="Consultar Disponibilidad", command=self.consultar_disponibilidad).grid(row=5, column=0, pady=5)
-        tk.Button(button_frame, text="Generar Reportes", command=self.generar_reportes).grid(row=6, column=0, pady=5)
+        self.reporte_visible = True  # Variable de control para saber si los reportes están visibles o no
+
+        button = tk.Button(button_frame, text="Generar Reportes", command=self.generar_reportes)
+        button.grid(row=6, column=0, pady=5)
+
+        
     
     def create_frames(self):
         # Frame para formulario dinámico
@@ -35,12 +41,27 @@ class BibliotecaApp:
     def registrar_autor(self):
         self.clear_frame()
         
+            
+        # Configuración del límite de caracteres para Nombre y Apellido
+        max_caracteres = 20  # Límite de caracteres para el nombre y apellido
+        
+        def validar_entrada(texto):
+            # Limita a max_caracteres la longitud de la entrada
+            if len(texto) > max_caracteres:
+                return False  # Si excede, no permite la entrada
+            if " " in texto:
+                return False  # Si contiene espacios, no permite la entrada
+            return True  # Si no excede ni tiene espacios, la entrada es válida
+        
+        # Crear la validación
+        vcmd = (self.form_frame.register(validar_entrada), "%P")
+        
         tk.Label(self.form_frame, text="Nombre:").grid(row=0, column=0, padx=5, pady=5)
-        nombre_entry = tk.Entry(self.form_frame)
+        nombre_entry = tk.Entry(self.form_frame, validate="key", validatecommand=vcmd)
         nombre_entry.grid(row=0, column=1)
         
         tk.Label(self.form_frame, text="Apellido:").grid(row=1, column=0, padx=5, pady=5)
-        apellido_entry = tk.Entry(self.form_frame)
+        apellido_entry = tk.Entry(self.form_frame, validate="key", validatecommand=vcmd)
         apellido_entry.grid(row=1, column=1)
         
         tk.Label(self.form_frame, text="Nacionalidad:").grid(row=2, column=0, padx=5, pady=5)
@@ -52,7 +73,7 @@ class BibliotecaApp:
         ]
         
         # Combobox para seleccionar la nacionalidad
-        nacionalidad_combobox = ttk.Combobox(self.form_frame, values=nacionalidades)
+        nacionalidad_combobox = ttk.Combobox(self.form_frame, values=nacionalidades, state="readonly")
         nacionalidad_combobox.grid(row=2, column=1)
         nacionalidad_combobox.set("Seleccionar nacionalidad")  # Texto inicial
         
@@ -75,35 +96,85 @@ class BibliotecaApp:
 
     def registrar_libro(self):
         self.clear_frame()
+                # Configuración del límite de caracteres para Nombre y Apellido
+        max_caracteres = 20  # Límite de caracteres para el nombre y apellido
+        
+        def validar_entrada(texto):
+            # Limita a max_caracteres la longitud de la entrada
+            if len(texto) > max_caracteres:
+                return False  # Si excede, no permite la entrada
+            if " " in texto:
+                return False  # Si contiene espacios, no permite la entrada
+            return True  # Si no excede ni tiene espacios, la entrada es válida
+        
+        # Crear la validación
+        vcmd = (self.form_frame.register(validar_entrada), "%P")
         
         tk.Label(self.form_frame, text="ISBN:").grid(row=0, column=0, padx=5, pady=5)
-        isbn_entry = tk.Entry(self.form_frame)
+        isbn_entry = tk.Entry(self.form_frame, validate="key", validatecommand=vcmd)
         isbn_entry.grid(row=0, column=1)
         
         tk.Label(self.form_frame, text="Título:").grid(row=1, column=0, padx=5, pady=5)
-        titulo_entry = tk.Entry(self.form_frame)
+        titulo_entry = tk.Entry(self.form_frame, validate="key", validatecommand=vcmd)
         titulo_entry.grid(row=1, column=1)
         
         tk.Label(self.form_frame, text="Género:").grid(row=2, column=0, padx=5, pady=5)
         generos = ["Ficción", "No Ficción", "Ciencia Ficción", "Fantasía", "Biografía", "Historia", "Romance", "Misterio"]
-        genero_combobox = ttk.Combobox(self.form_frame, values=generos)
+        genero_combobox = ttk.Combobox(self.form_frame, values=generos, state="readonly")
         genero_combobox.grid(row=2, column=1)
         genero_combobox.set("Seleccionar género")
         
+        
+
+        def validar_cantidad(texto):
+            try:
+                # Intentar convertir el texto a un número entero
+                cantidad = int(texto)
+                # Verificar que la cantidad sea mayor que 0
+                if cantidad > 0:
+                    return True
+                else:
+                    return False
+            except ValueError:
+                # Si no es un número entero, no es válido
+                return False
+
+        # Registrar la función de validación
+        vcmd_cantidad = (self.form_frame.register(validar_cantidad), "%P")
+        
         tk.Label(self.form_frame, text="Año de Publicación:").grid(row=3, column=0, padx=5, pady=5)
-        anio_entry = tk.Entry(self.form_frame)
+        anio_entry = tk.Entry(self.form_frame, validate="key", validatecommand=vcmd_cantidad)
         anio_entry.grid(row=3, column=1)
         
         # Desplegable para autores
+        
+        
         tk.Label(self.form_frame, text="Autor:").grid(row=4, column=0, padx=5, pady=5)
         autores = self.obtener_autores()
         autores_nombres = [f"{autor[1]} {autor[2]}" for autor in autores]
-        autor_combobox = ttk.Combobox(self.form_frame, values=autores_nombres)
+        autor_combobox = ttk.Combobox(self.form_frame, values=autores_nombres, state="readonly")
         autor_combobox.grid(row=4, column=1)
         autor_combobox.set("Seleccionar un autor")
         
+            # Función de validación para el campo cantidad
+        def validar_cantidad(texto):
+            try:
+                # Intentar convertir el texto a un número entero
+                cantidad = int(texto)
+                # Verificar que la cantidad sea mayor que 0
+                if cantidad > 0:
+                    return True
+                else:
+                    return False
+            except ValueError:
+                # Si no es un número entero, no es válido
+                return False
+
+        # Registrar la función de validación
+        vcmd_cantidad = (self.form_frame.register(validar_cantidad), "%P")
+        
         tk.Label(self.form_frame, text="Cantidad Disponible:").grid(row=5, column=0, padx=5, pady=5)
-        cantidad_entry = tk.Entry(self.form_frame)
+        cantidad_entry = tk.Entry(self.form_frame, validate="key", validatecommand=vcmd_cantidad)
         cantidad_entry.grid(row=5, column=1)
 
         def guardar_libro():
@@ -129,26 +200,53 @@ class BibliotecaApp:
     def registrar_usuario(self):
         self.clear_frame()
         
+        def validar_entrada(texto):
+            # Limita a max_caracteres la longitud de la entrada
+            if len(texto) > max_caracteres:
+                return False  # Si excede, no permite la entrada
+            if " " in texto:
+                return False  # Si contiene espacios, no permite la entrada
+            return True  # Si no excede ni tiene espacios, la entrada es válida
+        
+        # Crear la validación
+        vcmd = (self.form_frame.register(validar_entrada), "%P")
+        
         tk.Label(self.form_frame, text="Nombre:").grid(row=0, column=0, padx=5, pady=5)
-        nombre_entry = tk.Entry(self.form_frame)
+        nombre_entry = tk.Entry(self.form_frame, validate="key", validatecommand=vcmd)
         nombre_entry.grid(row=0, column=1)
         
         tk.Label(self.form_frame, text="Apellido:").grid(row=1, column=0, padx=5, pady=5)
-        apellido_entry = tk.Entry(self.form_frame)
+        apellido_entry = tk.Entry(self.form_frame, validate="key", validatecommand=vcmd)
         apellido_entry.grid(row=1, column=1)
         
         tk.Label(self.form_frame, text="Tipo de Usuario:").grid(row=2, column=0, padx=5, pady=5)
         tipos_usuario = ["Estudiante", "Profesor"]
-        tipo_usuario_combobox = ttk.Combobox(self.form_frame, values=tipos_usuario)
+        tipo_usuario_combobox = ttk.Combobox(self.form_frame, values=tipos_usuario, state="readonly")
         tipo_usuario_combobox.grid(row=2, column=1)
         tipo_usuario_combobox.set("Seleccionar tipo de usuario")
         
         tk.Label(self.form_frame, text="Dirección:").grid(row=3, column=0, padx=5, pady=5)
-        direccion_entry = tk.Entry(self.form_frame)
+        direccion_entry = tk.Entry(self.form_frame, validate="key", validatecommand=vcmd)
         direccion_entry.grid(row=3, column=1)
         
+        
+        def validar_cantidad(texto):
+            try:
+                # Intentar convertir el texto a un número entero
+                cantidad = int(texto)
+                # Verificar que la cantidad sea mayor que 0
+                if cantidad > 0:
+                    return True
+                else:
+                    return False
+            except ValueError:
+                # Si no es un número entero, no es válido
+                return False
+
+        # Registrar la función de validación
+        vcmd_cantidad = (self.form_frame.register(validar_cantidad), "%P")
         tk.Label(self.form_frame, text="Teléfono:").grid(row=4, column=0, padx=5, pady=5)
-        telefono_entry = tk.Entry(self.form_frame)
+        telefono_entry = tk.Entry(self.form_frame, validate="key", validatecommand=vcmd_cantidad)
         telefono_entry.grid(row=4, column=1)
         
         def guardar_usuario():
@@ -187,7 +285,7 @@ class BibliotecaApp:
         tk.Label(self.form_frame, text="Usuario:").grid(row=0, column=1, padx=5, pady=5)
         usuarios = self.obtener_usuarios()
         usuarios_nombres = [f"{usr[1]} {usr[2]}" for usr in usuarios]
-        usuario_combobox = ttk.Combobox(self.form_frame, values=usuarios_nombres)
+        usuario_combobox = ttk.Combobox(self.form_frame, values=usuarios_nombres, state="readonly")
         usuario_combobox.grid(row=0, column=2)
         usuario_combobox.set("Seleccionar un usuario")
         
@@ -195,7 +293,7 @@ class BibliotecaApp:
         tk.Label(self.form_frame, text="Libro:").grid(row=1, column=1, padx=5, pady=5)
         libros = self.obtener_libros()
         libros_titulos = [f"{libro[1]}" for libro in libros]
-        libro_combobox = ttk.Combobox(self.form_frame, values=libros_titulos)
+        libro_combobox = ttk.Combobox(self.form_frame, values=libros_titulos, state="readonly")
         libro_combobox.grid(row=1, column=2)
         libro_combobox.set("Seleccionar un libro")
         
@@ -282,7 +380,7 @@ class BibliotecaApp:
 
         # Crear lista de opciones con el título del libro y nombre del usuario
         prestamos_info = [f"{p[1]} - {p[2]}" for p in prestamos]  # Muestra "Título del libro - Nombre del usuario"
-        prestamo_combobox = ttk.Combobox(self.form_frame, values=prestamos_info)
+        prestamo_combobox = ttk.Combobox(self.form_frame, values=prestamos_info, state="readonly")
         prestamo_combobox.grid(row=1, column=1)
         prestamo_combobox.set("Seleccionar un préstamo")
 
@@ -317,7 +415,7 @@ class BibliotecaApp:
         tk.Label(self.form_frame, text="Título:").grid(row=0, column=0, padx=5, pady=5)
         
         # Entrada de texto para el título
-        titulo_entry = tk.Entry(self.form_frame)
+        titulo_entry = tk.Entry(self.form_frame, validate="key")
         titulo_entry.grid(row=0, column=1, padx=5, pady=5)
         
         def mostrar_disponibilidad():
@@ -348,6 +446,7 @@ class BibliotecaApp:
         button_frame = tk.Frame(self.root)
         button_frame.pack(side=tk.TOP, pady=10)
 
+        
         # Creación de botones para generar reportes
         tk.Button(button_frame, text="Préstamos vencidos", command=self.mostrar_prestamos_vencidos).grid(row=6, column=0, pady=5)
         tk.Button(button_frame, text="Libros más prestados del último mes", command=self.mostrar_libros_mas_prestados).grid(row=7, column=0, pady=5)
