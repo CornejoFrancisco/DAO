@@ -139,7 +139,6 @@ def prestamos_vencidos():
     fecha_actual = datetime.now().strftime('%Y-%m-%d')
     print(fecha_actual)
 
-    # Obtener los prestamos cuya fecha de devolucion sea menor a la fecha actual
     cursor.execute("""
         SELECT 
             u.nombre || ' ' || u.apellido AS usuario, 

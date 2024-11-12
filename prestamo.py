@@ -5,19 +5,19 @@ from tkcalendar import Calendar
 from clase import Prestamo
 from comun import *
 
-def mostrar_prestamos(self):    
+def mostrar_prestamos(self):
     # Ventana para mostrar los prestamos
-    ventana_usuario = tk.Toplevel(self.root)
-    ventana_usuario.title("Mostrar prestamos")
+    ventana_prestamos = tk.Toplevel(self.root)
+    ventana_prestamos.title("Mostrar prestamos")
     
     # Hacer que la ventana este al frente
-    ventana_usuario.lift()
-    ventana_usuario.attributes("-topmost", True)
-    ventana_usuario.after(100, lambda: ventana_usuario.attributes("-topmost", False)) 
+    ventana_prestamos.lift()
+    ventana_prestamos.attributes("-topmost", True)
+    ventana_prestamos.after(100, lambda: ventana_prestamos.attributes("-topmost", False)) 
 
     # Crear la grilla para mostrar los prestamos
     columnas = ("Usuario", "Libro", "Fecha Prestamo", "Dias Devolucion")
-    tree = ttk.Treeview(ventana_usuario, columns=columnas, show='headings')
+    tree = ttk.Treeview(ventana_prestamos, columns=columnas, show='headings')
     tree.pack(pady=20)
     
     for col in columnas:
@@ -34,7 +34,7 @@ def mostrar_prestamos(self):
             actualizar_fecha_devolucion(prestamo_id, fecha_hoy)
             messagebox.showinfo("Éxito", "El libro ha sido devuelto.")
             # Refrescar la ventana para mostrar los cambios
-            ventana_usuario.destroy()
+            ventana_prestamos.destroy()
             mostrar_prestamos(self)
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo registrar la devolucion: {e}")
@@ -58,7 +58,7 @@ def mostrar_prestamos(self):
         tree.insert('', 'end', values=(usuario, libro, fecha_prestamo, dias_devolucion))
         
     # Boton para registrar nuevos prestamos
-    tk.Button(ventana_usuario, text="Registrar prestamo", command=lambda: registrar_prestamo(self)).pack(pady=10)
+    tk.Button(ventana_prestamos, text="Registrar prestamo", command=lambda: registrar_prestamo(self, ventana_prestamos)).pack(pady=10)
 
     # Funcion para manejar el doble clic en una fila
     def on_row_double_click(event):
@@ -74,7 +74,7 @@ def mostrar_prestamos(self):
     # Asociar el evento de doble clic con la funcion
     tree.bind("<Double-1>", on_row_double_click)
 
-def registrar_prestamo(self):
+def registrar_prestamo(self, ventana_prestamos):
     ventana_prestamo = tk.Toplevel(self.root)
     ventana_prestamo.title("Registrar Prestamos Libro")    
     
@@ -142,7 +142,11 @@ def registrar_prestamo(self):
             )
             prestamo.guardar()
             messagebox.showinfo("Éxito", "Prestamo registrado correctamente.")
+            cerrarVentana(ventana_prestamos)
             cerrarVentana(ventana_prestamo)
+
+            # Actualizar la lista de prestamos después de registrar uno nuevo
+            mostrar_prestamos(self)
 
         except ValueError as e:
             messagebox.showerror("Error", str(e))
