@@ -5,17 +5,21 @@ from tkcalendar import Calendar
 from clase import Prestamo
 from comun import *
 
-def mostrar_prestamos(self):
+def mostrar_prestamos(self):    
     # Ventana para mostrar los prestamos
     ventana_usuario = tk.Toplevel(self.root)
     ventana_usuario.title("Mostrar prestamos")
+    
+    # Hacer que la ventana este al frente
+    ventana_usuario.lift()
+    ventana_usuario.attributes("-topmost", True)
+    ventana_usuario.after(100, lambda: ventana_usuario.attributes("-topmost", False)) 
 
-    # Crear la grilla (Treeview) para mostrar los prestamos
+    # Crear la grilla para mostrar los prestamos
     columnas = ("Usuario", "Libro", "Fecha Prestamo", "Dias Devolucion")
     tree = ttk.Treeview(ventana_usuario, columns=columnas, show='headings')
     tree.pack(pady=20)
     
-    # Definir las columnas
     for col in columnas:
         tree.heading(col, text=col)
 
@@ -90,7 +94,6 @@ def registrar_prestamo(self):
     libro_combobox.grid(row=1, column=1)
     libro_combobox.set("Seleccionar un libro")
     
-    # Campo de texto para la "Fecha de Prestamo" con la fecha de hoy y deshabilitado
     tk.Label(ventana_prestamo, text="Fecha de Prestamo:").grid(row=2, column=0, padx=5, pady=5)
     fecha_prestamo_text = tk.Entry(ventana_prestamo)
     fecha_prestamo_text.insert(0, datetime.now().strftime("%d-%m-%Y"))
@@ -108,7 +111,7 @@ def registrar_prestamo(self):
     
     def guardar_prestamo():
         try:
-            
+            # Validaciones
             if usuario_combobox.get() == "Seleccionar un usuario":
                 raise ValueError("Debe seleccionar un usuario")
             
@@ -118,23 +121,19 @@ def registrar_prestamo(self):
             if not validar_fecha_devolucion(fecha_prestamo_text.get(), fecha_devolucion_cal.get_date()):
                 raise ValueError("La fecha de devolucion debe ser mayor o igual al dia de hoy")
             
-            # Obtener el ID del usuario seleccionado en el combobox
             usuario_index = usuario_combobox.current()
             if usuario_index == -1:
                 raise ValueError("Seleccione un usuario valido.")
-            usuario_id = usuarios[usuario_index][0]  # ID del usuario seleccionado
+            usuario_id = usuarios[usuario_index][0]
 
-            # Obtener el ID del libro seleccionado en el combobox
             libro_index = libro_combobox.current()
             if libro_index == -1:
                 raise ValueError("Seleccione un libro valido.")
             libro_id = libros[libro_index][0] 
 
-            # Obtener la fecha de prestamo (de la entrada de texto) y la fecha de devolucion
             fecha_prestamo = datetime.strptime(fecha_prestamo_text.get(), "%d-%m-%Y").strftime("%Y-%m-%d")
             fecha_devolucion = fecha_devolucion_cal.get_date()
 
-            # Crear el objeto prestamo y guardarlo
             prestamo = Prestamo(
                 usuario_id,
                 libro_id,

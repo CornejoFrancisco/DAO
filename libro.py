@@ -11,32 +11,29 @@ def mostrar_libros(self):
     # Hacer que la ventana este al frente
     ventana_libro.lift()
     ventana_libro.attributes("-topmost", True)
-    ventana_libro.after(100, lambda: ventana_libro.attributes("-topmost", False))  # Se desactiva el topmost despues de 100 ms
+    ventana_libro.after(100, lambda: ventana_libro.attributes("-topmost", False))
     
-    # Crear la grilla (Treeview) para mostrar los libros
+    # Crear la grilla para mostrar los libros
     columnas = ("ISBN", "Titulo", "Genero", "Anio publicacion", "Autor", "Ejemplares")
     tree = ttk.Treeview(ventana_libro, columns=columnas, show='headings')
     tree.pack(pady=20)
 
-    # Definir las columnas
     for col in columnas:
         tree.heading(col, text=col)
 
-    # Funcion para actualizar la lista de libros en el Treeview
+    # Funcion para actualizar la lista de libros
     def actualizar_libros():
         for row in tree.get_children():
             tree.delete(row)
         libros = obtener_libros()
         for libro in libros:
             # Concatenar el nombre y apellido del autor en una sola columna
-            autor_completo = f"{libro[4]} {libro[5]}"  # libro[4] es el nombre y libro[5] es el apellido
+            autor_completo = f"{libro[4]} {libro[5]}"
             tree.insert('', 'end', values=(libro[0], libro[1], libro[2], libro[3], autor_completo, libro[6]))
-                # Poner la ventana al frente cada vez que se actualizan los autores
         ventana_libro.lift()
         ventana_libro.attributes("-topmost", True)
         ventana_libro.after(100, lambda: ventana_libro.attributes("-topmost", False))
     
-    # Cargar los libros al abrir la ventana
     actualizar_libros()
 
     # Crear un boton para registrar nuevos libros y pasar actualizar_libros como callback
@@ -54,6 +51,7 @@ def registrar_libro(self, callback):
     titulo_entry = tk.Entry(ventana_libro)
     titulo_entry.grid(row=1, column=1)
     
+    # Desplegable para genero de libros
     tk.Label(ventana_libro, text="Genero:").grid(row=2, column=0, padx=5, pady=5)
     generos = ["Ficcion", "No Ficcion", "Ciencia Ficcion", "Fantasia", "Biografia", "Historia", "Romance", "Misterio"]
     genero_combobox = ttk.Combobox(ventana_libro, values=generos, state="readonly")
@@ -78,6 +76,7 @@ def registrar_libro(self, callback):
 
     def guardar_libro():
         try:
+            # Validaciones
             if not validar_longitud_texto(isbn_entry.get(), 0, 14):
                 raise ValueError("El isbn debe tener mas de 0 caracteres y menos de 14 caracteres")
             
@@ -96,7 +95,6 @@ def registrar_libro(self, callback):
             if not validar_numeros_positivos(cantidad_entry.get()):
                 raise ValueError("La cantidad debe ser un numero positivo")
             
-            # Obtener el autor seleccionado y su ID
             autor_index = autor_combobox.current()
             if autor_index == -1:
                 raise ValueError("Seleccione un autor valido.")

@@ -13,22 +13,20 @@ def mostrar_usuarios(self):
     ventana_usuario.attributes("-topmost", True)
     ventana_usuario.after(100, lambda: ventana_usuario.attributes("-topmost", False)) 
 
-    # Crear la grilla (Treeview) para mostrar los autores
+    # Crear la grilla para mostrar los autores
     columnas = ("Nombre", "Apellido", "Rol", "Direccion", "Telefono")
     tree = ttk.Treeview(ventana_usuario, columns=columnas, show='headings')
     tree.pack(pady=20)
 
-    # Definir las columnas
     for col in columnas:
         tree.heading(col, text=col)
         
-        # Funcion para actualizar los datos en el Treeview y poner la ventana al frente
     def actualizar_usuarios():
         for row in tree.get_children():
             tree.delete(row)
         usuarios = obtener_usuarios()
         for usuario in usuarios:
-            tree.insert('', 'end', values=usuario[1:])  # Omitir el primer valor (id)
+            tree.insert('', 'end', values=usuario[1:])
         # Poner la ventana al frente cada vez que se actualizan los autores
         ventana_usuario.lift()
         ventana_usuario.attributes("-topmost", True)
@@ -51,6 +49,7 @@ def registrar_usuario(self, actualizar_usuarios):
     apellido_entry = tk.Entry(ventana_usuario)
     apellido_entry.grid(row=1, column=1)
     
+    # Desplegable para tipo de usuario
     tk.Label(ventana_usuario, text="Tipo de Usuario:").grid(row=2, column=0, padx=5, pady=5)
     tipos_usuario = ["Estudiante", "Profesor"]
     tipo_usuario_combobox = ttk.Combobox(ventana_usuario, values=tipos_usuario, state="readonly")
@@ -67,6 +66,7 @@ def registrar_usuario(self, actualizar_usuarios):
     
     def guardar_usuario():
         try:
+            # Validaciones
             if not validar_longitud_texto(nombre_entry.get()):
                 raise ValueError("El nombre debe tener mas de 0 caracteres y menos de 50 caracteres")
             

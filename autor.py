@@ -11,9 +11,9 @@ def mostrar_autores(self):
     # Hacer que la ventana este al frente
     ventana_autores.lift()
     ventana_autores.attributes("-topmost", True)
-    ventana_autores.after(100, lambda: ventana_autores.attributes("-topmost", False))  # Se desactiva el topmost despues de 100 ms
+    ventana_autores.after(100, lambda: ventana_autores.attributes("-topmost", False))
     
-    # Crear la grilla (Treeview) para mostrar los autores
+    # Crear la grilla para mostrar los autores
     columnas = ('Nombre', 'Apellido', 'Nacionalidad')
     tree = ttk.Treeview(ventana_autores, columns=columnas, show='headings')
     tree.pack(pady=20)
@@ -33,7 +33,7 @@ def mostrar_autores(self):
         ventana_autores.attributes("-topmost", True)
         ventana_autores.after(100, lambda: ventana_autores.attributes("-topmost", False))
 
-    actualizar_autores()  # Cargar autores al abrir la ventana
+    actualizar_autores()
     
     # Crear un boton para registrar nuevos autores
     tk.Button(
@@ -65,6 +65,7 @@ def registrar_autor(self, actualizar_autores):
     
     def guardar_autor():
         try:
+            # Validaciones
             if not validar_longitud_texto(nombre_entry.get()):
                 raise ValueError("El nombre debe tener mas de 0 caracteres y menos de 50 caracteres")
             

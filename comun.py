@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 import locale
 
 def validar_longitud_texto(text, min=0, max=100):
-    # Verificar que el texto tenga una longitud mayor o igual a cantMin y menor o igual a cantMax
     if min < len(text) < max:
         return True
     else:
@@ -11,32 +10,25 @@ def validar_longitud_texto(text, min=0, max=100):
 
 def validar_numeros_positivos(num, min=0):
     try:
-        # Intentar convertir el texto a un numero entero
         numero = int(num)
-        # Verificar si el numero es positivo
         return numero > min
     except ValueError:
-        # Si no se puede convertir el texto a un numero entero, retornar False
         return False
     
 def validar_anio_input(anio):
     try:
-        # Comprobar si el valor es numerico
         a = int(anio)
-        if 1900 <= a <= 2024:  # Permitimos el valor vacio tambien
+        if 1900 <= a <= 2024:
             return True
         else:
             return False
     except ValueError:
-        return False  # No es un numero, entonces no se permite
-    
+        return False
 
 def validar_fecha_devolucion(fecha_prestamo, fecha_devolucion):
-    # Convertir fechas a objetos datetime para poder compararlas
-    fecha_prestamo_obj = datetime.strptime(fecha_prestamo, "%d-%m-%Y")  # Fecha de préstamo en formato dd-mm-yyyy
-    fecha_devolucion_obj = datetime.strptime(fecha_devolucion, "%Y-%m-%d")  # Fecha de devolución en formato yyyy-mm-dd
+    fecha_prestamo_obj = datetime.strptime(fecha_prestamo, "%d-%m-%Y")
+    fecha_devolucion_obj = datetime.strptime(fecha_devolucion, "%Y-%m-%d")
     
-    # Validar si la fecha de devolucion es mayor o igual a la fecha de prestamo
     if fecha_devolucion_obj >= fecha_prestamo_obj:
         return True
     else:
@@ -163,31 +155,22 @@ def prestamos_vencidos():
     """, (fecha_actual, fecha_actual))
 
     prestamos_vencidos = cursor.fetchall()
-
-    # Cerrar la conexion
     conexion.close()
-
-    # Si hay resultados, formatearlos como una tupla (encabezado, datos)
     if prestamos_vencidos:
         encabezado = ["Usuario", "Libro", "Fecha Prestamo", "Dias Vencidos"]
         datos = [(p[0], p[1], p[2], round(p[3])) for p in prestamos_vencidos]  # Calcular los dias vencidos y redondear
         return (encabezado, datos)
     else:
-        # Si no hay resultados, devolver un encabezado vacio y una lista vacia
         return (["Usuario", "Libro", "Fecha Prestamo", "Dias Vencidos"], [])
     
 def obtener_mes_anterior():
-    # Establecer la configuracion regional a español
     locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
 
-    # Obtener la fecha actual
     hoy = datetime.today()
 
-    # Restar un mes a la fecha actual
     primer_dia_mes = hoy.replace(day=1)
     ultimo_mes = primer_dia_mes - timedelta(days=1)
 
-    # Obtener el nombre del mes anterior en español
     mes_anterior = ultimo_mes.strftime('%B')
 
     return mes_anterior
@@ -196,7 +179,6 @@ def libros_mas_prestados():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    # Obtener los libros mas prestados en el ultimo mes, agrupando por titulo y sumando la cantidad
     cursor.execute("""
         SELECT l.titulo, COUNT(p.codigo_ISBN) AS cantidad, l.genero
         FROM Prestamo p
@@ -209,9 +191,7 @@ def libros_mas_prestados():
     conexion.close()
 
     if libros_mas_prestados:
-        # Definir el encabezado
         encabezado = ["Titulo del Libro", "Cantidad de Prestamos", "Genero"]
-        # El resultado contiene los titulos de los libros y la cantidad de prestamos
         resultado = [(l[0], l[1], l[2]) for l in libros_mas_prestados]
         return encabezado, resultado
     else:
@@ -222,7 +202,6 @@ def usuarios_con_mas_prestamos():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
 
-    # Obtener los usuarios con mas prestamos
     cursor.execute("""
         SELECT u.nombre, u.apellido, COUNT(p.usuario_id) AS cantidad, u.tipo_usuario
         FROM Prestamo p
@@ -234,11 +213,9 @@ def usuarios_con_mas_prestamos():
     usuarios_con_mas_prestamos = cursor.fetchall()
     conexion.close()
 
-    # Si hay resultados, devolverlos en el formato correcto
     if usuarios_con_mas_prestamos:
         encabezado = ["Usuario", "Cantidad de Prestamos", "Rol"]
         datos = [(f"{u[0]} {u[1]}", u[2], u[3]) for u in usuarios_con_mas_prestamos]
         return (encabezado, datos)
     else:
-        # Si no hay resultados, devolver un encabezado vacio y una lista vacia
         return (["Usuario", "Cantidad de Prestamos", "Rol"], [])
