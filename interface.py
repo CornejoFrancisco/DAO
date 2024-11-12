@@ -9,7 +9,7 @@ from clase import *
 class BibliotecaApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Biblioteca - Gestión")
+        self.root.title("Biblioteca - Gestion")
         self.root.geometry("800x600")
         
         # Crear botones de acciones

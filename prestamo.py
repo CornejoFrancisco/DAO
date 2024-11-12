@@ -6,12 +6,12 @@ from clase import Prestamo
 from comun import *
 
 def mostrar_prestamos(self):
-    # Ventana para mostrar los préstamos
+    # Ventana para mostrar los prestamos
     ventana_usuario = tk.Toplevel(self.root)
-    ventana_usuario.title("Mostrar préstamos")
+    ventana_usuario.title("Mostrar prestamos")
 
-    # Crear la grilla (Treeview) para mostrar los préstamos
-    columnas = ("Usuario", "Libro", "Fecha Préstamo", "Días Devolución")
+    # Crear la grilla (Treeview) para mostrar los prestamos
+    columnas = ("Usuario", "Libro", "Fecha Prestamo", "Dias Devolucion")
     tree = ttk.Treeview(ventana_usuario, columns=columnas, show='headings')
     tree.pack(pady=20)
     
@@ -19,60 +19,60 @@ def mostrar_prestamos(self):
     for col in columnas:
         tree.heading(col, text=col)
 
-    # Obtener la lista de préstamos desde la base de datos
+    # Obtener la lista de prestamos desde la base de datos
     prestamos = obtener_prestamos_sin_devolucion()
     fecha_hoy = datetime.now().date()
     
     def devolver_libro(prestamo_id):
-        # Función para actualizar la fecha de devolución real en la base de datos
+        # Funcion para actualizar la fecha de devolucion real en la base de datos
         try:
-            # Actualiza la fecha de devolución en la base de datos (implementa esta función en tu sistema)
+            # Actualiza la fecha de devolucion en la base de datos (implementa esta funcion en tu sistema)
             actualizar_fecha_devolucion(prestamo_id, fecha_hoy)
             messagebox.showinfo("Éxito", "El libro ha sido devuelto.")
             # Refrescar la ventana para mostrar los cambios
             ventana_usuario.destroy()
             mostrar_prestamos(self)
         except Exception as e:
-            messagebox.showerror("Error", f"No se pudo registrar la devolución: {e}")
+            messagebox.showerror("Error", f"No se pudo registrar la devolucion: {e}")
 
     # Insertar los datos en la grilla
     for prestamo in prestamos:
         usuario, libro, fecha_prestamo, fecha_devolucion_estimada = prestamo
         
-        # Calcular los días restantes o de atraso
+        # Calcular los dias restantes o de atraso
         fecha_devolucion_estimada = datetime.strptime(fecha_devolucion_estimada, '%Y-%m-%d').date()
         dias_diferencia = (fecha_devolucion_estimada - fecha_hoy).days
 
         if dias_diferencia > 0:
-            dias_devolucion = f"{dias_diferencia} días restantes"
+            dias_devolucion = f"{dias_diferencia} dias restantes"
         elif dias_diferencia < 0:
-            dias_devolucion = f"{abs(dias_diferencia)} días atrasado"
+            dias_devolucion = f"{abs(dias_diferencia)} dias atrasado"
         else:
-            dias_devolucion = "Hoy es el último día"
+            dias_devolucion = "Hoy es el ultimo dia"
 
-        # Insertar la fila en el Treeview sin el botón
+        # Insertar la fila en el Treeview sin el boton
         tree.insert('', 'end', values=(usuario, libro, fecha_prestamo, dias_devolucion))
         
-    # Botón para registrar nuevos préstamos
-    tk.Button(ventana_usuario, text="Registrar préstamo", command=lambda: registrar_prestamo(self)).pack(pady=10)
+    # Boton para registrar nuevos prestamos
+    tk.Button(ventana_usuario, text="Registrar prestamo", command=lambda: registrar_prestamo(self)).pack(pady=10)
 
-    # Función para manejar el doble clic en una fila
+    # Funcion para manejar el doble clic en una fila
     def on_row_double_click(event):
         # Obtener el elemento seleccionado
         item_id = tree.selection()[0]
         index = tree.index(item_id)
-        prestamo_id = prestamos[index][0]  # Suponiendo que el ID del préstamo está en la primera posición de `prestamos`
+        prestamo_id = prestamos[index][0]  # Suponiendo que el ID del prestamo esta en la primera posicion de `prestamos`
 
-        # Confirmar la devolución
-        if messagebox.askyesno("Confirmar devolución", "¿Estás seguro de devolver este libro?"):
+        # Confirmar la devolucion
+        if messagebox.askyesno("Confirmar devolucion", "¿Estas seguro de devolver este libro?"):
             devolver_libro(prestamo_id)
 
-    # Asociar el evento de doble clic con la función
+    # Asociar el evento de doble clic con la funcion
     tree.bind("<Double-1>", on_row_double_click)
 
 def registrar_prestamo(self):
     ventana_prestamo = tk.Toplevel(self.root)
-    ventana_prestamo.title("Registrar Préstamos Libro")    
+    ventana_prestamo.title("Registrar Prestamos Libro")    
     
     # Desplegable para usuarios
     tk.Label(ventana_prestamo, text="Usuario:").grid(row=0, column=0, padx=5, pady=5)
@@ -90,15 +90,15 @@ def registrar_prestamo(self):
     libro_combobox.grid(row=1, column=1)
     libro_combobox.set("Seleccionar un libro")
     
-    # Campo de texto para la "Fecha de Préstamo" con la fecha de hoy y deshabilitado
-    tk.Label(ventana_prestamo, text="Fecha de Préstamo:").grid(row=2, column=0, padx=5, pady=5)
+    # Campo de texto para la "Fecha de Prestamo" con la fecha de hoy y deshabilitado
+    tk.Label(ventana_prestamo, text="Fecha de Prestamo:").grid(row=2, column=0, padx=5, pady=5)
     fecha_prestamo_text = tk.Entry(ventana_prestamo)
-    fecha_prestamo_text.insert(0, datetime.now().strftime("%d-%m-%Y"))  # Establece la fecha de hoy
-    fecha_prestamo_text.config(state="readonly")  # Ahora cambia el estado a readonly
+    fecha_prestamo_text.insert(0, datetime.now().strftime("%d-%m-%Y"))
+    fecha_prestamo_text.config(state="readonly")
     fecha_prestamo_text.grid(row=2, column=1, padx=5, pady=5)
 
-    # Etiqueta para "Fecha de devolución" con el widget Calendar
-    tk.Label(ventana_prestamo, text="Fecha de devolución:").grid(row=3, column=0, padx=5, pady=5)
+    # Etiqueta para "Fecha de devolucion" con el widget Calendar
+    tk.Label(ventana_prestamo, text="Fecha de devolucion:").grid(row=3, column=0, padx=5, pady=5)
     fecha_devolucion_cal = Calendar(
         ventana_prestamo,
         selectmode='day',
@@ -108,22 +108,33 @@ def registrar_prestamo(self):
     
     def guardar_prestamo():
         try:
+            
+            if usuario_combobox.get() == "Seleccionar un usuario":
+                raise ValueError("Debe seleccionar un usuario")
+            
+            if libro_combobox.get() == "Seleccionar un libro":
+                raise ValueError("Debe seleccionar un libro")
+            
+            if not validar_fecha_devolucion(fecha_prestamo_text.get(), fecha_devolucion_cal.get_date()):
+                raise ValueError("La fecha de devolucion debe ser mayor o igual al dia de hoy")
+            
             # Obtener el ID del usuario seleccionado en el combobox
             usuario_index = usuario_combobox.current()
             if usuario_index == -1:
-                raise ValueError("Seleccione un usuario válido.")
+                raise ValueError("Seleccione un usuario valido.")
             usuario_id = usuarios[usuario_index][0]  # ID del usuario seleccionado
-            
+
             # Obtener el ID del libro seleccionado en el combobox
             libro_index = libro_combobox.current()
             if libro_index == -1:
-                raise ValueError("Seleccione un libro válido.")
+                raise ValueError("Seleccione un libro valido.")
             libro_id = libros[libro_index][0] 
-            
-            # Obtener la fecha de préstamo (de la entrada de texto) y la fecha de devolución
-            fecha_prestamo = fecha_prestamo_text.get()
+
+            # Obtener la fecha de prestamo (de la entrada de texto) y la fecha de devolucion
+            fecha_prestamo = datetime.strptime(fecha_prestamo_text.get(), "%d-%m-%Y").strftime("%Y-%m-%d")
             fecha_devolucion = fecha_devolucion_cal.get_date()
-            
+
+            # Crear el objeto prestamo y guardarlo
             prestamo = Prestamo(
                 usuario_id,
                 libro_id,
@@ -131,8 +142,9 @@ def registrar_prestamo(self):
                 fecha_devolucion
             )
             prestamo.guardar()
-            messagebox.showinfo("Éxito", "Préstamo registrado correctamente.")
+            messagebox.showinfo("Éxito", "Prestamo registrado correctamente.")
             cerrarVentana(ventana_prestamo)
+
         except ValueError as e:
             messagebox.showerror("Error", str(e))
     

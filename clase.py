@@ -18,14 +18,14 @@ class Libro:
         cursor = conexion.cursor()
 
         cursor.execute("SELECT id FROM Autor WHERE id = ?", (self.autor_id,))
-        autor = cursor.fetchone()  # Retorna None si no encuentra ningún autor
+        autor = cursor.fetchone()  # Retorna None si no encuentra ningun autor
 
         conexion.close()
         return autor is not None
     
     def buscar_por_disponibilidad(titulo):
-        """Busca un libro por su título sin distinguir entre mayúsculas, minúsculas y acentos."""
-        # Normalizamos el título para eliminar acentos y pasarlo a minúsculas
+        """Busca un libro por su titulo sin distinguir entre mayusculas, minusculas y acentos."""
+        # Normalizamos el titulo para eliminar acentos y pasarlo a minusculas
         titulo_normalizado = unicodedata.normalize('NFKD', titulo).encode('ASCII', 'ignore').decode('ASCII').lower()
 
         conexion = obtener_conexion()
@@ -54,7 +54,7 @@ class Libro:
     
     def guardar(self):
         if not self.verificar_autor_existe():
-            raise ValueError(f"No se encontró un autor con ID {self.autor_id}")
+            raise ValueError(f"No se encontro un autor con ID {self.autor_id}")
 
         conexion = obtener_conexion()
         cursor = conexion.cursor()
@@ -129,7 +129,7 @@ class Prestamo:
         cursor = conexion.cursor()
 
         cursor.execute("SELECT id FROM Usuario WHERE id = ?", (self.usuario_id,))
-        autor = cursor.fetchone()  # Retorna None si no encuentra ningún autor
+        autor = cursor.fetchone()  # Retorna None si no encuentra ningun autor
 
         conexion.close()
         return autor is not None
@@ -145,7 +145,7 @@ class Prestamo:
             SET fecha_devolucion_real = ?
             WHERE usuario_id = ? AND nombre_libro = ? AND fecha_devolucion_real IS NULL
             """,
-            (fecha_actual, usuario_id, libro)  # Asegúrate de pasar los valores correctos
+            (fecha_actual, usuario_id, libro)  # Asegurate de pasar los valores correctos
         )
 
         conexion.commit()
@@ -155,7 +155,7 @@ class Prestamo:
     def buscar_prestamo(usuario_id, codigo_ISBN):
         conexion = obtener_conexion()
         cursor = conexion.cursor()
-        # Realiza un JOIN para obtener los préstamos basados en el nombre del libro
+        # Realiza un JOIN para obtener los prestamos basados en el nombre del libro
         cursor.execute(
         """
         SELECT P.* 
@@ -171,7 +171,7 @@ class Prestamo:
     def guardar(self):
         # Verificar si el usuario existe en la base de datos
         if not self.verificar_usuario_existe():
-            raise ValueError(f"No se encontró un usuario con ID {self.usuario_id}")
+            raise ValueError(f"No se encontro un usuario con ID {self.usuario_id}")
 
         # Verificar disponibilidad del libro
         with obtener_conexion() as conexion:
@@ -180,7 +180,7 @@ class Prestamo:
             libro = cursor.fetchone()
 
             if not libro:
-                raise ValueError(f"No se encontró el libro '{self.codigo_ISBN}' en la base de datos.")
+                raise ValueError(f"No se encontro el libro '{self.codigo_ISBN}' en la base de datos.")
 
             cantidad_disponible = libro[0]
 
@@ -193,7 +193,7 @@ class Prestamo:
                 (self.codigo_ISBN,),
             )
 
-            # Registrar el préstamo
+            # Registrar el prestamo
             cursor.execute(
                 "INSERT INTO Prestamo (usuario_id, codigo_ISBN, fecha_prestamo, fecha_devolucion_estimada, fecha_devolucion_real) "
                 "VALUES (?, ?, ?, ?, ?)",

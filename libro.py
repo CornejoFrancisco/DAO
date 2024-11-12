@@ -8,10 +8,10 @@ def mostrar_libros(self):
     ventana_libro = tk.Toplevel(self.root)
     ventana_libro.title("Mostrar libro")
     
-    # Hacer que la ventana esté al frente
+    # Hacer que la ventana este al frente
     ventana_libro.lift()
     ventana_libro.attributes("-topmost", True)
-    ventana_libro.after(100, lambda: ventana_libro.attributes("-topmost", False))  # Se desactiva el topmost después de 100 ms
+    ventana_libro.after(100, lambda: ventana_libro.attributes("-topmost", False))  # Se desactiva el topmost despues de 100 ms
     
     # Crear la grilla (Treeview) para mostrar los libros
     columnas = ("ISBN", "Titulo", "Genero", "Anio publicacion", "Autor", "Ejemplares")
@@ -22,7 +22,7 @@ def mostrar_libros(self):
     for col in columnas:
         tree.heading(col, text=col)
 
-    # Función para actualizar la lista de libros en el Treeview
+    # Funcion para actualizar la lista de libros en el Treeview
     def actualizar_libros():
         for row in tree.get_children():
             tree.delete(row)
@@ -39,37 +39,29 @@ def mostrar_libros(self):
     # Cargar los libros al abrir la ventana
     actualizar_libros()
 
-    # Crear un botón para registrar nuevos libros y pasar actualizar_libros como callback
+    # Crear un boton para registrar nuevos libros y pasar actualizar_libros como callback
     tk.Button(ventana_libro, text="Registrar libro", command=lambda: registrar_libro(self, actualizar_libros)).pack(pady=10)
 
 def registrar_libro(self, callback):
     ventana_libro = tk.Toplevel(self.root)
     ventana_libro.title("Registrar Libro")
-    
-    # Validador ISBN
-    vcmd = (ventana_libro.register(validar_longitud_isbn), '%P')
 
     tk.Label(ventana_libro, text="ISBN:").grid(row=0, column=0, padx=5, pady=5)
-    isbn_entry = tk.Entry(ventana_libro, validate="key", validatecommand=vcmd)
+    isbn_entry = tk.Entry(ventana_libro)
     isbn_entry.grid(row=0, column=1)
     
-    # Validador longitud texto
-    vcmd = (ventana_libro.register(validar_longitud_texto), '%P')
-    
-    tk.Label(ventana_libro, text="Título:").grid(row=1, column=0, padx=5, pady=5)
-    titulo_entry = tk.Entry(ventana_libro, validate="key", validatecommand=vcmd)
+    tk.Label(ventana_libro, text="Titulo:").grid(row=1, column=0, padx=5, pady=5)
+    titulo_entry = tk.Entry(ventana_libro)
     titulo_entry.grid(row=1, column=1)
     
-    tk.Label(ventana_libro, text="Género:").grid(row=2, column=0, padx=5, pady=5)
-    generos = ["Ficción", "No Ficción", "Ciencia Ficción", "Fantasía", "Biografía", "Historia", "Romance", "Misterio"]
+    tk.Label(ventana_libro, text="Genero:").grid(row=2, column=0, padx=5, pady=5)
+    generos = ["Ficcion", "No Ficcion", "Ciencia Ficcion", "Fantasia", "Biografia", "Historia", "Romance", "Misterio"]
     genero_combobox = ttk.Combobox(ventana_libro, values=generos, state="readonly")
     genero_combobox.grid(row=2, column=1)
-    genero_combobox.set("Seleccionar género")
+    genero_combobox.set("Seleccionar genero")
     
-    vcmd = (ventana_libro.register(validar_anio_input), '%P')
-    
-    tk.Label(ventana_libro, text="Año de Publicación:").grid(row=3, column=0, padx=5, pady=5)
-    anio_entry = tk.Entry(ventana_libro, validate="key", validatecommand=vcmd)
+    tk.Label(ventana_libro, text="Año de Publicacion:").grid(row=3, column=0, padx=5, pady=5)
+    anio_entry = tk.Entry(ventana_libro)
     anio_entry.grid(row=3, column=1)
     
     # Desplegable para autores
@@ -80,18 +72,34 @@ def registrar_libro(self, callback):
     autor_combobox.grid(row=4, column=1)
     autor_combobox.set("Seleccionar un autor")
     
-    vcmd = (ventana_libro.register(validar_numeros_positivos), '%num')
-        
     tk.Label(ventana_libro, text="Cantidad Disponible:").grid(row=5, column=0, padx=5, pady=5)
-    cantidad_entry = tk.Entry(ventana_libro, validate="key")
+    cantidad_entry = tk.Entry(ventana_libro)
     cantidad_entry.grid(row=5, column=1)
 
     def guardar_libro():
         try:
+            if not validar_longitud_texto(isbn_entry.get(), 0, 14):
+                raise ValueError("El isbn debe tener mas de 0 caracteres y menos de 14 caracteres")
+            
+            if not validar_longitud_texto(titulo_entry.get()):
+                raise ValueError("El titulo debe tener mas de 0 caracteres y menos de 50 caracteres")
+            
+            if genero_combobox.get() == "Seleccionar genero":
+                raise ValueError("Debe seleccionar un genero")
+
+            if not validar_anio_input(anio_entry.get()):
+                raise ValueError("El anio debe ser anterior a 2024")
+
+            if autor_combobox.get() == "Seleccionar un autor":
+                raise ValueError("Debe seleccionar un autor")
+            
+            if not validar_numeros_positivos(cantidad_entry.get()):
+                raise ValueError("La cantidad debe ser un numero positivo")
+            
             # Obtener el autor seleccionado y su ID
             autor_index = autor_combobox.current()
             if autor_index == -1:
-                raise ValueError("Seleccione un autor válido.")
+                raise ValueError("Seleccione un autor valido.")
             autor_id = autores[autor_index][0]
 
             libro = Libro(

@@ -14,9 +14,9 @@ def mostrar_opciones_reportes(self):
     ventana_reportes = tk.Toplevel(self.root)
     ventana_reportes.title("Generar Reportes")
     
-    tk.Button(ventana_reportes, text="Préstamos vencidos", command=lambda: mostrar_prestamos_vencidos(self)).pack(pady=10)
-    tk.Button(ventana_reportes, text="Libros más prestados del último mes", command=lambda: mostrar_libros_mas_prestados(self)).pack(pady=10)
-    tk.Button(ventana_reportes, text="Usuarios con más préstamos", command=lambda: mostrar_usuarios_con_mas_prestamos(self)).pack(pady=10)
+    tk.Button(ventana_reportes, text="Prestamos vencidos", command=lambda: mostrar_prestamos_vencidos(self)).pack(pady=10)
+    tk.Button(ventana_reportes, text="Libros mas prestados del ultimo mes", command=lambda: mostrar_libros_mas_prestados(self)).pack(pady=10)
+    tk.Button(ventana_reportes, text="Usuarios con mas prestamos", command=lambda: mostrar_usuarios_con_mas_prestamos(self)).pack(pady=10)
     tk.Button(ventana_reportes, text="Volver", command=lambda: cerrarVentana(ventana_reportes)).pack(pady=10)
 
 def mostrar_prestamos_vencidos(self):
@@ -55,12 +55,12 @@ def mostrar_resultado(self, resultado, nombre, titulo):
     
     # Añadir las filas de datos
     for item in datos:
-        table_data.append(item)  # Cada fila es una tupla (título del libro, cantidad)
+        table_data.append(item)  # Cada fila es una tupla (titulo del libro, cantidad)
     
     # Crear la tabla con los datos
     table = Table(table_data)
 
-    # Estilo de la tabla (puedes personalizarlo según tus necesidades)
+    # Estilo de la tabla (puedes personalizarlo segun tus necesidades)
     style = TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.lightslategray),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
@@ -75,7 +75,7 @@ def mostrar_resultado(self, resultado, nombre, titulo):
     elements.append(Spacer(10, 10))
     elements.append(table)
 
-    # Construir el documento con el título y la tabla
+    # Construir el documento con el titulo y la tabla
     doc.build(elements)
 
     # Notificar al usuario que el PDF ha sido generado
