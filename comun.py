@@ -2,6 +2,45 @@ from database import obtener_conexion
 from datetime import datetime, timedelta
 import locale
 
+def validar_longitud_isbn(P):
+    # Verificar que el texto tenga una longitud mayor o igual a cantMin y menor o igual a cantMax
+    longitud = len(P)
+    
+    if 10 <= longitud <= 13:
+        return True
+    else:
+        return False
+
+def validar_longitud_texto(P):
+    # Verificar que el texto tenga una longitud mayor o igual a cantMin y menor o igual a cantMax
+    longitud = len(P)
+    
+    if 0 < longitud <= 50:
+        return True
+    else:
+        return False
+
+def validar_numeros_positivos(P):
+    try:
+        # Intentar convertir el texto a un número entero
+        numero = int(P)
+        # Verificar si el número es positivo
+        return numero > 0
+    except ValueError:
+        # Si no se puede convertir el texto a un número entero, retornar False
+        return False
+    
+def validar_anio_input(P):
+    try:
+        # Comprobar si el valor es numérico
+        anio = int(P)
+        if 1900 <= anio <= 2024 or P == "":  # Permitimos el valor vacío también
+            return True
+        else:
+            return False
+    except ValueError:
+        return False  # No es un número, entonces no se permite
+
 def obtener_autores():
     """Función para obtener una lista de autores desde la base de datos."""
     conexion = obtener_conexion()
@@ -11,24 +50,9 @@ def obtener_autores():
     conexion.close()
     return autores
 
-def validar_longitud_texto(texto, cantMin=0, cantMax=100):
-    # Verificar que el texto tenga una longitud mayor o igual a cantMin y menor o igual a cantMax
-    longitud = len(texto)
-    
-    if cantMin <= longitud <= cantMax:
-        return True
-    else:
-        return False
-
-def validar_numeros_positivos(texto):
-    try:
-        # Intentar convertir el texto a un número entero
-        numero = int(texto)
-        # Verificar si el número es positivo
-        return numero > 0
-    except ValueError:
-        # Si no se puede convertir el texto a un número entero, retornar False
-        return False
+def validar_numeros(P):
+    # Verifica si el texto está vacío o contiene solo dígitos
+    return P.isdigit()
 
 def obtener_usuarios():
     """Función para obtener una lista de usuarios desde la base de datos."""
@@ -203,7 +227,7 @@ def usuarios_con_mas_prestamos():
 
     # Obtener los usuarios con más préstamos
     cursor.execute("""
-        SELECT u.nombre, u.apellido, COUNT(p.usuario_id) AS cantidad
+        SELECT u.nombre, u.apellido, COUNT(p.usuario_id) AS cantidad, u.tipo_usuario
         FROM Prestamo p
         JOIN Usuario u ON p.usuario_id = u.id
         GROUP BY p.usuario_id
@@ -215,9 +239,9 @@ def usuarios_con_mas_prestamos():
 
     # Si hay resultados, devolverlos en el formato correcto
     if usuarios_con_mas_prestamos:
-        encabezado = ["Usuario", "Cantidad de Préstamos"]
-        datos = [(f"{u[0]} {u[1]}", u[2]) for u in usuarios_con_mas_prestamos]
+        encabezado = ["Usuario", "Cantidad de Préstamos", "Rol"]
+        datos = [(f"{u[0]} {u[1]}", u[2], u[3]) for u in usuarios_con_mas_prestamos]
         return (encabezado, datos)
     else:
         # Si no hay resultados, devolver un encabezado vacío y una lista vacía
-        return (["Usuario", "Cantidad de Préstamos"], [])
+        return (["Usuario", "Cantidad de Préstamos", "Rol"], [])

@@ -1,0 +1,4 @@
+Fechas validaciones
+Y stock positivo
+En el libro hacer un orestamo
+Control fechas devoluciones y prestamos

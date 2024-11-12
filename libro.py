@@ -44,24 +44,32 @@ def mostrar_libros(self):
 
 def registrar_libro(self, callback):
     ventana_libro = tk.Toplevel(self.root)
-    ventana_libro.title("Registrar Libro")                    
+    ventana_libro.title("Registrar Libro")
+    
+    # Validador ISBN
+    vcmd = (ventana_libro.register(validar_longitud_isbn), '%P')
 
     tk.Label(ventana_libro, text="ISBN:").grid(row=0, column=0, padx=5, pady=5)
-    isbn_entry = tk.Entry(ventana_libro, validate="key")
+    isbn_entry = tk.Entry(ventana_libro, validate="key", validatecommand=vcmd)
     isbn_entry.grid(row=0, column=1)
     
+    # Validador longitud texto
+    vcmd = (ventana_libro.register(validar_longitud_texto), '%P')
+    
     tk.Label(ventana_libro, text="Título:").grid(row=1, column=0, padx=5, pady=5)
-    titulo_entry = tk.Entry(ventana_libro, validate="key")
+    titulo_entry = tk.Entry(ventana_libro, validate="key", validatecommand=vcmd)
     titulo_entry.grid(row=1, column=1)
     
     tk.Label(ventana_libro, text="Género:").grid(row=2, column=0, padx=5, pady=5)
     generos = ["Ficción", "No Ficción", "Ciencia Ficción", "Fantasía", "Biografía", "Historia", "Romance", "Misterio"]
     genero_combobox = ttk.Combobox(ventana_libro, values=generos, state="readonly")
     genero_combobox.grid(row=2, column=1)
-    genero_combobox.set("Seleccionar género")        
+    genero_combobox.set("Seleccionar género")
+    
+    vcmd = (ventana_libro.register(validar_anio_input), '%P')
     
     tk.Label(ventana_libro, text="Año de Publicación:").grid(row=3, column=0, padx=5, pady=5)
-    anio_entry = tk.Entry(ventana_libro, validate="key")
+    anio_entry = tk.Entry(ventana_libro, validate="key", validatecommand=vcmd)
     anio_entry.grid(row=3, column=1)
     
     # Desplegable para autores
@@ -71,6 +79,8 @@ def registrar_libro(self, callback):
     autor_combobox = ttk.Combobox(ventana_libro, values=autores_nombres, state="readonly")
     autor_combobox.grid(row=4, column=1)
     autor_combobox.set("Seleccionar un autor")
+    
+    vcmd = (ventana_libro.register(validar_numeros_positivos), '%num')
         
     tk.Label(ventana_libro, text="Cantidad Disponible:").grid(row=5, column=0, padx=5, pady=5)
     cantidad_entry = tk.Entry(ventana_libro, validate="key")

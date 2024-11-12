@@ -62,9 +62,12 @@ def registrar_usuario(self, actualizar_usuarios):
     tk.Label(ventana_usuario, text="Dirección:").grid(row=3, column=0, padx=5, pady=5)
     direccion_entry = tk.Entry(ventana_usuario, validate="key", validatecommand=vcmd)
     direccion_entry.grid(row=3, column=1)
+    
+    # Validador longitud texto
+    vcmd = (ventana_usuario.register(validar_numeros), '%P')
 
     tk.Label(ventana_usuario, text="Teléfono:").grid(row=4, column=0, padx=5, pady=5)
-    telefono_entry = tk.Entry(ventana_usuario, validate="key")
+    telefono_entry = tk.Entry(ventana_usuario, validate="key", validatecommand=vcmd)
     telefono_entry.grid(row=4, column=1)
     
     def guardar_usuario():
