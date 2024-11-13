@@ -112,7 +112,7 @@ def registrar_prestamo(self, ventana_prestamos, isbn=None, titulo=None):
         libros = [(isbn, titulo)]
         combobox_state = "disabled"
     else:
-        libros = obtener_libros()
+        libros = obtener_libros_con_ejemplares()
         libros_titulos = [f"{libro[1]}" for libro in libros]
         combobox_state = "readonly"
     

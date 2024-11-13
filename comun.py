@@ -74,6 +74,30 @@ def obtener_libros():
     conexion.close()
     return libros
 
+def obtener_libros_con_ejemplares():
+    """Función para obtener una lista de libros con los datos del autor desde la base de datos y con la cantidad de ejemplares mayor a 0."""
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    cursor.execute("""
+        SELECT 
+            L.codigo_ISBN, 
+            L.titulo, 
+            L.genero, 
+            L.anio_publicacion, 
+            A.nombre AS nombre_autor, 
+            A.apellido AS apellido_autor, 
+            L.cantidad_disponible 
+        FROM 
+            Libro L
+        INNER JOIN 
+            Autor A ON L.autor_id = A.id
+        WHERE 
+            L.cantidad_disponible > 0
+    """)
+    libros = cursor.fetchall()
+    conexion.close()
+    return libros
+
 def obtener_prestamos():
     """Obtiene una lista de prestamos, ordenados por la fecha de devolucion real (null primero, luego los no null)."""
     conexion = obtener_conexion()

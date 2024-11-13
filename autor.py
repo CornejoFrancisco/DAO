@@ -14,9 +14,21 @@ def mostrar_autores(self):
     ventana_autores.after(100, lambda: ventana_autores.attributes("-topmost", False))
     
     # Crear la grilla para mostrar los autores
+    #columnas = ('Nombre', 'Apellido', 'Nacionalidad')
+    #tree = ttk.Treeview(ventana_autores, columns=columnas, show='headings')
+    #tree.pack(pady=20)
+
+    frame_tree = tk.Frame(ventana_autores)
+    frame_tree.pack(fill="both", expand=True, pady=20)
+
+    # Crear el Treeview con el scrollbar
     columnas = ('Nombre', 'Apellido', 'Nacionalidad')
-    tree = ttk.Treeview(ventana_autores, columns=columnas, show='headings')
-    tree.pack(pady=20)
+    tree = ttk.Treeview(frame_tree, columns=columnas, show='headings')
+    tree.pack(side="left", fill="both", expand=True)
+    
+    scrollbar = ttk.Scrollbar(frame_tree, orient="vertical", command=tree.yview)
+    tree.configure(yscroll=scrollbar.set)
+    scrollbar.pack(side="right", fill="y")
     
     for col in columnas:
         tree.heading(col, text=col)
@@ -46,7 +58,8 @@ def mostrar_autores(self):
 
 def registrar_autor(self, actualizar_autores):
     ventana_autor = tk.Toplevel(self.root)
-    ventana_autor.title("Registrar Autor")        
+    ventana_autor.title("Registrar Autor")
+    ventana_autor.geometry("250x200")        
             
     tk.Label(ventana_autor, text="Nombre:").grid(row=0, column=0, padx=5, pady=5)
     nombre_entry = tk.Entry(ventana_autor)
@@ -83,7 +96,13 @@ def registrar_autor(self, actualizar_autores):
             actualizar_autores()
             cerrarVentana(ventana_autor)
         except ValueError as e:
+            ventana_autor.lift()
+            ventana_autor.attributes("-topmost", True)
+            ventana_autor.after(100, lambda: ventana_autor.attributes("-topmost", False))
             messagebox.showerror("Error", str(e))
     
-    tk.Button(ventana_autor, text="Guardar", command=guardar_autor).grid(row=3, column=0, columnspan=2, pady=10)
-    tk.Button(ventana_autor, text="Cancelar", command=lambda: cerrarVentana(ventana_autor)).grid(row=3, column=1, columnspan=2, pady=10)
+    botones_frame = tk.Frame(ventana_autor)
+    botones_frame.grid(row=5, column=0, columnspan=2, pady=10)
+    tk.Button(botones_frame, text="Guardar", command=guardar_autor).pack(side="left", padx=(0, 10))
+    tk.Button(botones_frame, text="Cancelar", command=lambda: cerrarVentana(ventana_autor)).pack(side="left")
+    

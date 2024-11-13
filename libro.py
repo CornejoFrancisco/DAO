@@ -45,7 +45,12 @@ def mostrar_libros(self):
             libro_info = item['values']
             isbn = libro_info[0]
             titulo = libro_info[1]
+            ejemplares = libro_info[5]
             
+            if ejemplares == 0:
+                messagebox.showwarning("Sin ejemplares", "No hay ejemplares disponibles para realizar el prestamo.")
+                return
+
             registrar_prestamo(self, ventana_libro, isbn, titulo)
             actualizar_libros()  # Actualiza la lista despues del prestamo
         else:
@@ -123,7 +128,7 @@ def registrar_libro(self, callback):
                 raise ValueError("Debe seleccionar un genero")
 
             if not validar_anio_input(anio_entry.get()):
-                raise ValueError("El anio debe ser anterior a 2024")
+                raise ValueError("El año debe ser mayor a 1900 y menor a 2024")
 
             if autor_combobox.get() == "Seleccionar un autor":
                 raise ValueError("Debe seleccionar un autor")
