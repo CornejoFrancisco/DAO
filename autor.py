@@ -38,7 +38,9 @@ def mostrar_autores(self):
     # Crear un boton para registrar nuevos autores
     tk.Button(
         ventana_autores, text="Registrar autor", 
-        command=lambda: registrar_autor(self, actualizar_autores)
+        command=lambda: registrar_autor(self, actualizar_autores),
+        bg="green",
+        fg="white"
     ).pack(pady=10)
 
 
@@ -77,7 +79,7 @@ def registrar_autor(self, actualizar_autores):
 
             autor = Autor(nombre_entry.get(), apellido_entry.get(), nacionalidad_combobox.get())
             autor.guardar()
-            messagebox.showinfo("Éxito", "Autor registrado correctamente.")
+            messagebox.showinfo("Exito", "Autor registrado correctamente.")
             actualizar_autores()
             cerrarVentana(ventana_autor)
         except ValueError as e:

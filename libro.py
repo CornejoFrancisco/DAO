@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 from clase import Libro
 from comun import *
+from prestamo import registrar_prestamo
 
 def mostrar_libros(self):
     # Limpiar el frame actual antes de mostrar los libros
@@ -36,9 +37,44 @@ def mostrar_libros(self):
     
     actualizar_libros()
 
-    # Crear un boton para registrar nuevos libros y pasar actualizar_libros como callback
-    tk.Button(ventana_libro, text="Registrar libro", command=lambda: registrar_libro(self, actualizar_libros)).pack(pady=10)
+    # Funcion para realizar un prestamo de un libro seleccionado
+    def realizar_prestamo():
+        selected_item = tree.selection()
+        if selected_item:
+            item = tree.item(selected_item)
+            libro_info = item['values']
+            isbn = libro_info[0]
+            titulo = libro_info[1]
+            
+            registrar_prestamo(self, ventana_libro, isbn, titulo)
+            actualizar_libros()  # Actualiza la lista despues del prestamo
+        else:
+            messagebox.showwarning("Seleccion requerida", "Seleccione un libro para realizar el prestamo.")
 
+    # Crear un Frame para los botones y colocarlos uno al lado del otro
+    botones_frame = tk.Frame(ventana_libro)
+    botones_frame.pack(pady=10)
+
+    # Botón para registrar nuevos préstamos (color verde)
+    boton_registrar = tk.Button(
+        botones_frame, 
+        text="Registrar libro",
+        command=lambda: registrar_libro(self, actualizar_libros),
+        bg="green", 
+        fg="white"
+    )
+    boton_registrar.pack(side="left", padx=5)
+
+    # Botón para devolver el libro seleccionado (color azul)
+    boton_devolver = tk.Button(
+        botones_frame, 
+        text="Realizar prestamo",
+        command=realizar_prestamo,
+        bg="blue", 
+        fg="white"
+    )
+    boton_devolver.pack(side="left", padx=5)
+    
 def registrar_libro(self, callback):
     ventana_libro = tk.Toplevel(self.root)
     ventana_libro.title("Registrar Libro")
@@ -105,7 +141,7 @@ def registrar_libro(self, callback):
                 int(anio_entry.get()), autor_id, int(cantidad_entry.get())
             )
             libro.guardar()
-            messagebox.showinfo("Éxito", "Libro registrado correctamente.")
+            messagebox.showinfo("Exito", "Libro registrado correctamente.")
             callback()
             cerrarVentana(ventana_libro)
         except ValueError as e:

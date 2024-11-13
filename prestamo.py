@@ -27,18 +27,30 @@ def mostrar_prestamos(self):
     prestamos = obtener_prestamos_sin_devolucion()
     fecha_hoy = datetime.now().date()
     
-    def devolver_libro(prestamo_id):
-        # Funcion para actualizar la fecha de devolucion real en la base de datos
-        try:
-            # Actualiza la fecha de devolucion en la base de datos (implementa esta funcion en tu sistema)
-            actualizar_fecha_devolucion(prestamo_id, fecha_hoy)
-            messagebox.showinfo("Éxito", "El libro ha sido devuelto.")
-            # Refrescar la ventana para mostrar los cambios
-            ventana_prestamos.destroy()
-            mostrar_prestamos(self)
-        except Exception as e:
-            messagebox.showerror("Error", f"No se pudo registrar la devolucion: {e}")
-
+    def devolver_libro():
+        # Obtener el elemento seleccionado
+        selected_item = tree.selection()
+        if selected_item:
+            item_id = selected_item[0]
+            index = tree.index(item_id)
+            prestamo_id = prestamos[index][0]
+            libro = tree.item(selected_item)['values'][1]
+            print(libro)
+            
+            if messagebox.askyesno("Confirmar devolucion", f"¿Realizar devolucion del libro {libro}?"):
+                try:
+                    # Actualizar la fecha de devolucion en la base de datos
+                    actualizar_fecha_devolucion(prestamo_id, fecha_hoy)
+                    messagebox.showinfo("Exito", "El libro ha sido devuelto.")
+                    
+                    # Refrescar la ventana para mostrar los cambios
+                    ventana_prestamos.destroy()
+                    mostrar_prestamos(self)
+                except Exception as e:
+                    messagebox.showerror("Error", f"No se pudo registrar la devolucion: {e}")
+        else:
+            messagebox.showwarning("Seleccion requerida", "Seleccione un libro para devolver.")
+    
     # Insertar los datos en la grilla
     for prestamo in prestamos:
         usuario, libro, fecha_prestamo, fecha_devolucion_estimada = prestamo
@@ -54,29 +66,36 @@ def mostrar_prestamos(self):
         else:
             dias_devolucion = "Hoy es el ultimo dia"
 
-        # Insertar la fila en el Treeview sin el boton
+        # Insertar la fila en el Treeview
         tree.insert('', 'end', values=(usuario, libro, fecha_prestamo, dias_devolucion))
         
-    # Boton para registrar nuevos prestamos
-    tk.Button(ventana_prestamos, text="Registrar prestamo", command=lambda: registrar_prestamo(self, ventana_prestamos)).pack(pady=10)
+    # Crear un Frame para los botones y colocarlos uno al lado del otro
+    botones_frame = tk.Frame(ventana_prestamos)
+    botones_frame.pack(pady=10)
 
-    # Funcion para manejar el doble clic en una fila
-    def on_row_double_click(event):
-        # Obtener el elemento seleccionado
-        item_id = tree.selection()[0]
-        index = tree.index(item_id)
-        prestamo_id = prestamos[index][0]  # Suponiendo que el ID del prestamo esta en la primera posicion de `prestamos`
+    # Botón para registrar nuevos préstamos (color verde)
+    boton_registrar = tk.Button(
+        botones_frame, 
+        text="Registrar préstamo", 
+        command=lambda: registrar_prestamo(self, ventana_prestamos),
+        bg="green", 
+        fg="white"
+    )
+    boton_registrar.pack(side="left", padx=5)
 
-        # Confirmar la devolucion
-        if messagebox.askyesno("Confirmar devolucion", "¿Estas seguro de devolver este libro?"):
-            devolver_libro(prestamo_id)
+    # Botón para devolver el libro seleccionado (color azul)
+    boton_devolver = tk.Button(
+        botones_frame, 
+        text="Devolver libro", 
+        command=devolver_libro,
+        bg="blue", 
+        fg="white"
+    )
+    boton_devolver.pack(side="left", padx=5)
 
-    # Asociar el evento de doble clic con la funcion
-    tree.bind("<Double-1>", on_row_double_click)
-
-def registrar_prestamo(self, ventana_prestamos):
+def registrar_prestamo(self, ventana_prestamos, isbn=None, titulo=None):
     ventana_prestamo = tk.Toplevel(self.root)
-    ventana_prestamo.title("Registrar Prestamos Libro")    
+    ventana_prestamo.title("Registrar Prestamo de Libro")
     
     # Desplegable para usuarios
     tk.Label(ventana_prestamo, text="Usuario:").grid(row=0, column=0, padx=5, pady=5)
@@ -88,12 +107,20 @@ def registrar_prestamo(self, ventana_prestamos):
     
     # Desplegable para libros
     tk.Label(ventana_prestamo, text="Libro:").grid(row=1, column=0, padx=5, pady=5)
-    libros = obtener_libros()
-    libros_titulos = [f"{libro[1]}" for libro in libros]
-    libro_combobox = ttk.Combobox(ventana_prestamo, values=libros_titulos, state="readonly")
-    libro_combobox.grid(row=1, column=1)
-    libro_combobox.set("Seleccionar un libro")
+    if isbn and titulo:
+        libros_titulos = [f"{titulo}"]
+        libros = [(isbn, titulo)]
+        combobox_state = "disabled"
+    else:
+        libros = obtener_libros()
+        libros_titulos = [f"{libro[1]}" for libro in libros]
+        combobox_state = "readonly"
     
+    libro_combobox = ttk.Combobox(ventana_prestamo, values=libros_titulos, state=combobox_state)
+    libro_combobox.grid(row=1, column=1)
+    libro_combobox.set("Seleccionar un libro" if not isbn else libros_titulos[0])
+    
+    # Campo de Fecha de Prestamo
     tk.Label(ventana_prestamo, text="Fecha de Prestamo:").grid(row=2, column=0, padx=5, pady=5)
     fecha_prestamo_text = tk.Entry(ventana_prestamo)
     fecha_prestamo_text.insert(0, datetime.now().strftime("%d-%m-%Y"))
@@ -141,11 +168,11 @@ def registrar_prestamo(self, ventana_prestamos):
                 fecha_devolucion
             )
             prestamo.guardar()
-            messagebox.showinfo("Éxito", "Prestamo registrado correctamente.")
+            messagebox.showinfo("Exito", "Prestamo registrado correctamente.")
             cerrarVentana(ventana_prestamos)
             cerrarVentana(ventana_prestamo)
 
-            # Actualizar la lista de prestamos después de registrar uno nuevo
+            # Actualizar la lista de prestamos despues de registrar uno nuevo
             mostrar_prestamos(self)
 
         except ValueError as e:

@@ -35,7 +35,13 @@ def mostrar_usuarios(self):
     actualizar_usuarios()
         
     # Crear un boton para registrar nuevos autores
-    tk.Button(ventana_usuario, text="Registrar usuario", command=lambda: registrar_usuario(self, actualizar_usuarios)).pack(pady=10)
+    tk.Button(
+        ventana_usuario, 
+        text="Registrar usuario", 
+        command=lambda: registrar_usuario(self, actualizar_usuarios),
+        bg="green",
+        fg="white"
+    ).pack(pady=10)
         
 def registrar_usuario(self, actualizar_usuarios):
     ventana_usuario = tk.Toplevel(self.root)
@@ -87,7 +93,7 @@ def registrar_usuario(self, actualizar_usuarios):
                 direccion_entry.get(), telefono_entry.get()
             )
             usuario.guardar()
-            messagebox.showinfo("Éxito", "Usuario registrado correctamente.")
+            messagebox.showinfo("Exito", "Usuario registrado correctamente.")
             actualizar_usuarios()
             cerrarVentana(ventana_usuario)
         except ValueError as e:
