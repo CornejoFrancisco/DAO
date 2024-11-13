@@ -119,3 +119,5 @@ def registrar_usuario(self, actualizar_usuarios):
 
     # Botón "Cancelar" con padding a la izquierda para separación
     tk.Button(botones_frame, text="Cancelar", command=lambda: cerrarVentana(ventana_usuario)).pack(side="left")
+
+    

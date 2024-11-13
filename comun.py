@@ -128,6 +128,7 @@ def obtener_prestamos_sin_devolucion():
     cursor = conexion.cursor()
     cursor.execute("""
         SELECT 
+            Prestamo.id,
             Usuario.nombre || ' ' || Usuario.apellido AS usuario_nombre, 
             Libro.titulo, 
             fecha_prestamo, 
@@ -142,15 +143,37 @@ def obtener_prestamos_sin_devolucion():
     return prestamos
 
 def actualizar_fecha_devolucion(prestamo_id, fecha_hoy):
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    cursor.execute("""
-        UPDATE Prestamo
-        SET fecha_devolucion_real = ?
-        WHERE id = ?
-    """, (fecha_hoy, prestamo_id))
-    conexion.commit()
-    conexion.close()
+    try:
+        # Asegurarse de que la fecha esté en el formato correcto
+        if isinstance(fecha_hoy, datetime):
+            fecha_hoy = fecha_hoy.strftime("%Y-%m-%d")
+        
+        # Conectar y ejecutar el update
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
+        
+        # Verificar si el prestamo_id existe
+        cursor.execute("SELECT * FROM Prestamo WHERE id = ?", (prestamo_id,))
+        prestamo = cursor.fetchone()
+        if not prestamo:
+            print(f"No se encontró ningún préstamo con id: {prestamo_id}")
+            return
+        
+        # Ejecutar la actualización
+        cursor.execute("""
+            UPDATE Prestamo
+            SET fecha_devolucion_real = ?
+            WHERE id = ?
+        """, (fecha_hoy, prestamo_id))
+        
+        conexion.commit()
+        print(f"Fecha de devolución actualizada para el préstamo {prestamo_id}")
+    
+    except Exception as e:
+        print(f"Error al actualizar la fecha de devolución: {e}")
+    
+    finally:
+        conexion.close()
 
 def cerrarVentana(ventana):
     """Funcion que cierra la ventana pasada como argumento."""

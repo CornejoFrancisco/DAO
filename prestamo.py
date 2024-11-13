@@ -6,74 +6,74 @@ from clase import Prestamo
 from comun import *
 
 def mostrar_prestamos(self):
-    # Ventana para mostrar los prestamos
+    # Ventana para mostrar los préstamos
     ventana_prestamos = tk.Toplevel(self.root)
-    ventana_prestamos.title("Mostrar prestamos")
+    ventana_prestamos.title("Mostrar préstamos")
+    ventana_prestamos.minsize(1100, 320)
     
-    # Hacer que la ventana este al frente
     ventana_prestamos.lift()
     ventana_prestamos.attributes("-topmost", True)
     ventana_prestamos.after(100, lambda: ventana_prestamos.attributes("-topmost", False)) 
 
-    # Crear la grilla para mostrar los prestamos
-    columnas = ("Usuario", "Libro", "Fecha Prestamo", "Dias Devolucion")
-    tree = ttk.Treeview(ventana_prestamos, columns=columnas, show='headings')
-    tree.pack(pady=20)
+    frame_tree = tk.Frame(ventana_prestamos)
+    frame_tree.pack(fill="both", expand=True)
+
+    columnas = ("Usuario", "Libro", "Fecha Préstamo", "Días Devolución")
+    tree = ttk.Treeview(frame_tree, columns=columnas, show='headings')
+    tree.pack(side="left", fill="both", expand=True, pady=20)
+
+    scrollbar = ttk.Scrollbar(frame_tree, orient="vertical", command=tree.yview)
+    tree.configure(yscroll=scrollbar.set)
+    scrollbar.pack(side="right", fill="y")
     
     for col in columnas:
         tree.heading(col, text=col)
 
-    # Obtener la lista de prestamos desde la base de datos
+    # **Refrescar los préstamos desde la base de datos**
     prestamos = obtener_prestamos_sin_devolucion()
     fecha_hoy = datetime.now().date()
-    
+
+
     def devolver_libro():
-        # Obtener el elemento seleccionado
         selected_item = tree.selection()
         if selected_item:
-            item_id = selected_item[0]
-            index = tree.index(item_id)
-            prestamo_id = prestamos[index][0]
+            prestamo_id = int(tree.item(selected_item, "tags")[0])  # Obtiene el `prestamo_id` desde los tags
             libro = tree.item(selected_item)['values'][1]
-            print(libro)
             
-            if messagebox.askyesno("Confirmar devolucion", f"¿Realizar devolucion del libro {libro}?"):
+            if messagebox.askyesno("Confirmar devolución", f"¿Realizar devolución del libro {libro}?"):
                 try:
-                    # Actualizar la fecha de devolucion en la base de datos
                     actualizar_fecha_devolucion(prestamo_id, fecha_hoy)
-                    messagebox.showinfo("Exito", "El libro ha sido devuelto.")
-                    
-                    # Refrescar la ventana para mostrar los cambios
+                    messagebox.showinfo("Éxito", "El libro ha sido devuelto.")
+
+                    # Destruir la ventana actual y recargarla
                     ventana_prestamos.destroy()
                     mostrar_prestamos(self)
                 except Exception as e:
-                    messagebox.showerror("Error", f"No se pudo registrar la devolucion: {e}")
+                    messagebox.showerror("Error", f"No se pudo registrar la devolución: {e}")
+                    print(f"Error al actualizar la devolución: {e}")
         else:
-            messagebox.showwarning("Seleccion requerida", "Seleccione un libro para devolver.")
+            messagebox.showwarning("Selección requerida", "Seleccione un libro para devolver.")
+
     
-    # Insertar los datos en la grilla
+    # Insertar datos en el Treeview y mostrar la devolución actualizada
     for prestamo in prestamos:
-        usuario, libro, fecha_prestamo, fecha_devolucion_estimada = prestamo
+        prestamo_id, usuario, libro, fecha_prestamo, fecha_devolucion_estimada = prestamo
         
-        # Calcular los dias restantes o de atraso
         fecha_devolucion_estimada = datetime.strptime(fecha_devolucion_estimada, '%Y-%m-%d').date()
         dias_diferencia = (fecha_devolucion_estimada - fecha_hoy).days
 
         if dias_diferencia > 0:
-            dias_devolucion = f"{dias_diferencia} dias restantes"
+            dias_devolucion = f"{dias_diferencia} días restantes"
         elif dias_diferencia < 0:
-            dias_devolucion = f"{abs(dias_diferencia)} dias atrasado"
+            dias_devolucion = f"{abs(dias_diferencia)} días atrasado"
         else:
-            dias_devolucion = "Hoy es el ultimo dia"
+            dias_devolucion = "Hoy es el último día"
 
-        # Insertar la fila en el Treeview
-        tree.insert('', 'end', values=(usuario, libro, fecha_prestamo, dias_devolucion))
-        
-    # Crear un Frame para los botones y colocarlos uno al lado del otro
+        tree.insert('', 'end', values=(usuario, libro, fecha_prestamo, dias_devolucion), tags=(prestamo_id,))
+
     botones_frame = tk.Frame(ventana_prestamos)
     botones_frame.pack(pady=10)
 
-    # Botón para registrar nuevos préstamos (color verde)
     boton_registrar = tk.Button(
         botones_frame, 
         text="Registrar préstamo", 
@@ -83,7 +83,6 @@ def mostrar_prestamos(self):
     )
     boton_registrar.pack(side="left", padx=5)
 
-    # Botón para devolver el libro seleccionado (color azul)
     boton_devolver = tk.Button(
         botones_frame, 
         text="Devolver libro", 
@@ -96,7 +95,7 @@ def mostrar_prestamos(self):
 def registrar_prestamo(self, ventana_prestamos, isbn=None, titulo=None):
     ventana_prestamo = tk.Toplevel(self.root)
     ventana_prestamo.title("Registrar Prestamo de Libro")
-    
+    ventana_prestamo.minsize(500, 350)
     # Desplegable para usuarios
     tk.Label(ventana_prestamo, text="Usuario:").grid(row=0, column=0, padx=5, pady=5)
     usuarios = obtener_usuarios()
@@ -174,6 +173,7 @@ def registrar_prestamo(self, ventana_prestamos, isbn=None, titulo=None):
 
             # Actualizar la lista de prestamos despues de registrar uno nuevo
             mostrar_prestamos(self)
+
 
         except ValueError as e:
             messagebox.showerror("Error", str(e))

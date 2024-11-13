@@ -13,6 +13,8 @@ def mostrar_opciones_reportes(self):
     # Crear una nueva ventana para los reportes
     ventana_reportes = tk.Toplevel(self.root)
     ventana_reportes.title("Generar Reportes")
+    ventana_reportes.minsize(300, 250)
+
     
     tk.Button(ventana_reportes, text="Prestamos vencidos", command=lambda: mostrar_prestamos_vencidos(self)).pack(pady=10)
     tk.Button(ventana_reportes, text="Libros mas prestados del ultimo mes", command=lambda: mostrar_libros_mas_prestados(self)).pack(pady=10)
