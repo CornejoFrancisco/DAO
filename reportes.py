@@ -100,6 +100,8 @@ def mostrar_opciones_reportes(self):
     tk.Button(ventana_reportes, text="Prestamos vencidos", command=lambda: mostrar_prestamos_vencidos(self), **button_style).pack(pady=10)
     tk.Button(ventana_reportes, text="Libros más prestados del último mes", command=lambda: mostrar_libros_mas_prestados(self), **button_style).pack(pady=10)
     tk.Button(ventana_reportes, text="Usuarios con más préstamos", command=lambda: mostrar_usuarios_con_mas_prestamos(self), **button_style).pack(pady=10)
+    tk.Button(ventana_reportes, text="Libros por autor", command=lambda: mostrar_libros_por_autor(self), **button_style).pack(pady=10)
+
     tk.Button(ventana_reportes, text="Volver", command=lambda: cerrarVentana(ventana_reportes), **button_style2).pack(pady=10)
 
 def mostrar_prestamos_vencidos(self):
@@ -113,6 +115,10 @@ def mostrar_libros_mas_prestados(self):
 def mostrar_usuarios_con_mas_prestamos(self):
     report = usuarios_con_mas_prestamos()
     mostrar_resultado(self, report, "usuarios con mas prestamos", "Top 5 Usuarios con más préstamos")
+    
+def mostrar_libros_por_autor(self):
+    report = libros_por_autor()
+    mostrar_resultado(self, report, "libros por autor", "Libros por autor")
 
 def mostrar_resultado(self, resultado, nombre, titulo):
     # Asegurarse de que la carpeta "informes" existe
@@ -155,6 +161,7 @@ def mostrar_resultado(self, resultado, nombre, titulo):
     style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.lightslategray),
                         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
                         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
                         ('BACKGROUND', (0, 1), (-1, -1), colors.white),

@@ -52,7 +52,6 @@ def mostrar_prestamos(self):
                     mostrar_prestamos(self)
                 except Exception as e:
                     messagebox.showerror("Error", f"No se pudo registrar la devolución: {e}")
-                    print(f"Error al actualizar la devolución: {e}")
         else:
             messagebox.showwarning("Selección requerida", "Seleccione un libro para devolver.")
 

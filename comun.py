@@ -180,7 +180,6 @@ def actualizar_fecha_devolucion(prestamo_id, fecha_hoy):
         """, (prestamo_id,))
         
         conexion.commit()
-        print(f"Fecha de devolución actualizada para el préstamo {prestamo_id}")
     
     except Exception as e:
         print(f"Error al actualizar la fecha de devolución: {e}")
@@ -197,7 +196,6 @@ def prestamos_vencidos():
     cursor = conexion.cursor()
 
     fecha_actual = datetime.now().strftime('%Y-%m-%d')
-    print(fecha_actual)
 
     cursor.execute("""
         SELECT 
@@ -278,3 +276,32 @@ def usuarios_con_mas_prestamos():
         return (encabezado, datos)
     else:
         return (["Usuario", "Cantidad de Prestamos", "Rol"], [])
+
+def libros_por_autor():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    # Ejecutamos una consulta para obtener los autores y sus libros
+    cursor.execute("""
+        SELECT a.nombre || ' ' || a.apellido AS autor, l.titulo
+        FROM Autor a
+        JOIN Libro l ON a.id = l.autor_id
+    """)
+    
+    # Obtenemos todos los registros
+    registros = cursor.fetchall()
+    conexion.close()
+    
+    # Creamos un diccionario para agrupar los libros por autor
+    libros_por_autor = {}
+    for autor, titulo in registros:
+        if autor not in libros_por_autor:
+            libros_por_autor[autor] = []
+        libros_por_autor[autor].append(titulo)
+
+    # Convertimos el diccionario en el formato requerido
+    datos = [(autor, "\n".join(libros)) for autor, libros in libros_por_autor.items()]
+    
+    # Encabezado de la tabla
+    encabezado = ["Autor", "Libros"]
+    return (encabezado, datos)
