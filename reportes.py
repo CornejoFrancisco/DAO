@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+from io import BytesIO
 import tkinter as tk
 from tkinter import messagebox
 from comun import *
@@ -5,9 +7,35 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import  A4
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.platypus.tables import Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
+
+
+def generar_grafico_por_genero(datos):
+    # Contar libros por género usando los datos del reporte específico
+    generos = {}
+    for item in datos:
+        genero = item[2]  # Tercer elemento en cada registro es el género
+        generos[genero] = generos.get(genero, 0) + 1
+
+    # Datos para el gráfico
+    labels = list(generos.keys())
+    data = list(generos.values())
+    
+    # Crear un gráfico de pastel
+    plt.figure(figsize=(6, 4))
+    plt.pie(data, labels=labels, autopct='%1.1f%%', startangle=140)
+    plt.axis('equal')  # Mantener la proporción circular
+
+    # Guardar el gráfico en un búfer
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plt.close()  # Cerrar el gráfico para liberar memoria
+    
+    return buffer  # Retornar el gráfico como objeto de BytesIO
+
 
 def mostrar_opciones_reportes(self):
     # Crear una nueva ventana para los reportes
@@ -42,16 +70,12 @@ def mostrar_resultado(self, resultado, nombre, titulo):
     
     # Crear una lista para almacenar los elementos del informe
     elements = []
-    
-    # Crear estilos para el informe
     styles = getSampleStyleSheet()
     
     elements.append(Paragraph(titulo, styles['Title']))
     
     # Crear la tabla con los datos
     table_data = []
-    
-    # Encabezado de la tabla
     encabezado, datos = resultado  # resultado es una tupla (encabezado, datos)
     table_data.append(encabezado)  # Añadir encabezado
     
@@ -61,8 +85,6 @@ def mostrar_resultado(self, resultado, nombre, titulo):
     
     # Crear la tabla con los datos
     table = Table(table_data)
-
-    # Estilo de la tabla (puedes personalizarlo segun tus necesidades)
     style = TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.lightslategray),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
@@ -72,12 +94,21 @@ def mostrar_resultado(self, resultado, nombre, titulo):
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ('GRID', (0, 0), (-1, -1), 1, colors.black)
         ])
-    
     table.setStyle(style)
+    
     elements.append(Spacer(10, 10))
     elements.append(table)
 
-    # Construir el documento con el titulo y la tabla
+    # Agregar el gráfico solo si el reporte es "Libros más prestados"
+    if nombre == "libros mas prestados":
+        elements.append(Spacer(1, 12))
+        elements.append(Paragraph("Distribución de Libros por Género", styles['Heading2']))
+        elements.append(Spacer(1, 12))
+        
+        grafico_buffer = generar_grafico_por_genero(datos)
+        elements.append(Image(grafico_buffer, width=400, height=250))
+    
+    # Construir el documento con el título, tabla y, si corresponde, el gráfico
     doc.build(elements)
 
     # Notificar al usuario que el PDF ha sido generado
