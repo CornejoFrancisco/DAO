@@ -17,11 +17,11 @@ class BibliotecaApp:
 
         # Cargar el ícono de la ventana
         self.set_window_icon()
-        # Crear título
-        self.create_title()
         # Cargar el logo
         self.logo = tk.PhotoImage(file="UTN_logo.png")  # Asegúrate de que "logo.png" esté en la misma carpeta o especifica la ruta completa
         self.create_logo()  # Agrega el logo a la interfaz
+        # Crear título
+        self.create_title()
         # Crear botones de acciones
         self.create_buttons()
 
@@ -43,7 +43,7 @@ class BibliotecaApp:
         
         # Crear un Label para el logo y colocarlo en la esquina superior izquierda
         logo_label = tk.Label(self.root, image=self.logo, bg="#f0f0f0")
-        logo_label.pack(side=tk.TOP, anchor="nw", padx=10, pady=0)
+        logo_label.pack(side=tk.RIGHT, anchor="nw", padx=10, pady=0)
 
 
     def create_buttons(self):
