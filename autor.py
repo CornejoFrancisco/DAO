@@ -62,7 +62,11 @@ def registrar_autor(self, actualizar_autores):
     ventana_autor = tk.Toplevel(self.root)
     ventana_autor.title("Registrar Autor")
     ventana_autor.geometry("250x200")
-    ventana_autor.minsize(250, 200)        
+    ventana_autor.minsize(250, 200)
+
+    ventana_autor.lift()
+    ventana_autor.attributes("-topmost", True)
+    ventana_autor.after(100, lambda: ventana_autor.attributes("-topmost", False))        
             
     tk.Label(ventana_autor, text="Nombre:").grid(row=0, column=0, padx=5, pady=5)
     nombre_entry = tk.Entry(ventana_autor)

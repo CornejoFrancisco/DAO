@@ -97,7 +97,11 @@ def registrar_libro(self, callback):
     ventana_libro = tk.Toplevel(self.root)
     ventana_libro.title("Registrar Libro")
     ventana_libro.geometry("350x250") 
-    ventana_libro.minsize(350, 250) 
+    ventana_libro.minsize(350, 250)
+
+    ventana_libro.lift()
+    ventana_libro.attributes("-topmost", True)
+    ventana_libro.after(100, lambda: ventana_libro.attributes("-topmost", False))
 
     tk.Label(ventana_libro, text="ISBN:").grid(row=0, column=0, padx=5, pady=5)
     isbn_entry = tk.Entry(ventana_libro)

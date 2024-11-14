@@ -96,6 +96,11 @@ def registrar_prestamo(self, ventana_prestamos, isbn=None, titulo=None):
     ventana_prestamo = tk.Toplevel(self.root)
     ventana_prestamo.title("Registrar Prestamo de Libro")
     ventana_prestamo.minsize(500, 350)
+
+    ventana_prestamo.lift()
+    ventana_prestamo.attributes("-topmost", True)
+    ventana_prestamo.after(100, lambda: ventana_prestamo.attributes("-topmost", False))  
+
     # Desplegable para usuarios
     tk.Label(ventana_prestamo, text="Usuario:").grid(row=0, column=0, padx=5, pady=5)
     usuarios = obtener_usuarios()

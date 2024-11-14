@@ -165,6 +165,16 @@ def actualizar_fecha_devolucion(prestamo_id, fecha_hoy):
             SET fecha_devolucion_real = ?
             WHERE id = ?
         """, (fecha_hoy, prestamo_id))
+
+        cursor.execute("""
+            UPDATE Libro
+            SET cantidad_disponible = cantidad_disponible + 1
+            WHERE codigo_ISBN = (
+                SELECT codigo_ISBN
+                FROM Prestamo
+                WHERE id = ?
+            )
+        """, (prestamo_id,))
         
         conexion.commit()
         print(f"Fecha de devolución actualizada para el préstamo {prestamo_id}")

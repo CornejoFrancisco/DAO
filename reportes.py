@@ -43,6 +43,10 @@ def mostrar_opciones_reportes(self):
     ventana_reportes.title("Generar Reportes")
     ventana_reportes.minsize(300, 250)
 
+    ventana_reportes.lift()
+    ventana_reportes.attributes("-topmost", True)
+    ventana_reportes.after(100, lambda: ventana_reportes.attributes("-topmost", False))
+
     
     tk.Button(ventana_reportes, text="Prestamos vencidos", command=lambda: mostrar_prestamos_vencidos(self)).pack(pady=10)
     tk.Button(ventana_reportes, text="Libros mas prestados del ultimo mes", command=lambda: mostrar_libros_mas_prestados(self)).pack(pady=10)
