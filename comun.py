@@ -1,6 +1,7 @@
 from database import obtener_conexion
 from datetime import datetime, timedelta
 import locale
+from datetime import datetime
 
 def validar_longitud_texto(text, min=0, max=100):
     if min < len(text) < max:
@@ -16,9 +17,11 @@ def validar_numeros_positivos(num, min=0):
         return False
     
 def validar_anio_input(anio):
+    año = datetime.now().year
+
     try:
         a = int(anio)
-        if 1900 <= a <= 2024:
+        if  a <= año:
             return True
         else:
             return False

@@ -147,7 +147,7 @@ def registrar_libro(self, callback):
                 raise ValueError("Debe seleccionar un genero")
 
             if not validar_anio_input(anio_entry.get()):
-                raise ValueError("El año debe ser mayor a 1900 y menor a 2024")
+                raise ValueError("El año debe ser menor o igual al actual")
 
             if autor_combobox.get() == "Seleccionar un autor":
                 raise ValueError("Debe seleccionar un autor")
