@@ -1,16 +1,15 @@
 import matplotlib.pyplot as plt
 from io import BytesIO
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, PhotoImage
 from comun import *
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import  A4
+from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.platypus.tables import Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
-
 
 def generar_grafico_por_genero(datos):
     # Contar libros por género usando los datos del reporte específico
@@ -36,18 +35,41 @@ def generar_grafico_por_genero(datos):
     
     return buffer  # Retornar el gráfico como objeto de BytesIO
 
-
 def mostrar_opciones_reportes(self):
+    icon_image = PhotoImage(file="UTN_logo.png")
+
     # Crear una nueva ventana para los reportes
     ventana_reportes = tk.Toplevel(self.root)
     ventana_reportes.title("Generar Reportes")
-    ventana_reportes.minsize(300, 250)
+    ventana_reportes.minsize(550, 350)
+    ventana_reportes.iconphoto(True, icon_image)
 
-    
-    tk.Button(ventana_reportes, text="Prestamos vencidos", command=lambda: mostrar_prestamos_vencidos(self)).pack(pady=10)
-    tk.Button(ventana_reportes, text="Libros mas prestados del ultimo mes", command=lambda: mostrar_libros_mas_prestados(self)).pack(pady=10)
-    tk.Button(ventana_reportes, text="Usuarios con mas prestamos", command=lambda: mostrar_usuarios_con_mas_prestamos(self)).pack(pady=10)
-    tk.Button(ventana_reportes, text="Volver", command=lambda: cerrarVentana(ventana_reportes)).pack(pady=10)
+
+    # Configuración de estilo de los botones
+    button_style = {
+        "bg": "#00a3fb",             # Fondo verde
+        "fg": "white",               # Texto blanco
+        "font": ("Helvetica", 12, "bold"),  # Fuente del texto
+        "width": 40,                 # Ancho del botón
+        "height": 2,                 # Alto del botón
+        "relief": "raised",          # Efecto 3D
+        "bd": 3                      # Grosor del borde
+    }
+    button_style2 = {
+        "bg": "#f75e25",             # Fondo verde
+        "fg": "white",               # Texto blanco
+        "font": ("Helvetica", 12, "bold"),  # Fuente del texto
+        "width": 20,                 # Ancho del botón
+        "height": 2,                 # Alto del botón
+        "relief": "raised",          # Efecto 3D
+        "bd": 3                      # Grosor del borde
+    }
+
+    # Crear botones con el estilo definido
+    tk.Button(ventana_reportes, text="Prestamos vencidos", command=lambda: mostrar_prestamos_vencidos(self), **button_style).pack(pady=10)
+    tk.Button(ventana_reportes, text="Libros más prestados del último mes", command=lambda: mostrar_libros_mas_prestados(self), **button_style).pack(pady=10)
+    tk.Button(ventana_reportes, text="Usuarios con más préstamos", command=lambda: mostrar_usuarios_con_mas_prestamos(self), **button_style).pack(pady=10)
+    tk.Button(ventana_reportes, text="Volver", command=lambda: cerrarVentana(ventana_reportes), **button_style2).pack(pady=10)
 
 def mostrar_prestamos_vencidos(self):
     report = prestamos_vencidos()
@@ -55,11 +77,11 @@ def mostrar_prestamos_vencidos(self):
 
 def mostrar_libros_mas_prestados(self):
     report = libros_mas_prestados()
-    mostrar_resultado(self, report, "libros mas prestados", f"Libros mas prestados de {obtener_mes_anterior()}")
+    mostrar_resultado(self, report, "libros mas prestados", f"Libros más prestados de {obtener_mes_anterior()}")
 
 def mostrar_usuarios_con_mas_prestamos(self):
     report = usuarios_con_mas_prestamos()
-    mostrar_resultado(self, report, "usuarios con mas prestamos", "Top 5 Usuarios con mas prestamos")
+    mostrar_resultado(self, report, "usuarios con mas prestamos", "Top 5 Usuarios con más préstamos")
 
 def mostrar_resultado(self, resultado, nombre, titulo):
     # Crear un archivo PDF
@@ -85,15 +107,13 @@ def mostrar_resultado(self, resultado, nombre, titulo):
     
     # Crear la tabla con los datos
     table = Table(table_data)
-    style = TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightslategray),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black)
-        ])
+    style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.lightslategray),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                        ('GRID', (0, 0), (-1, -1), 1, colors.black)])
     table.setStyle(style)
     
     elements.append(Spacer(10, 10))
