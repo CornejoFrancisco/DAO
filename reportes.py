@@ -11,6 +11,8 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.platypus.tables import Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
 import os  # Importar el módulo os para gestionar rutas y crear carpetas
+from datetime import datetime
+
 
 def generar_grafico_por_genero(datos):
     # Contar libros por género usando los datos del reporte específico
@@ -90,9 +92,18 @@ def mostrar_resultado(self, resultado, nombre, titulo):
     if not os.path.exists(carpeta_informes):
         os.makedirs(carpeta_informes)
 
+     # Añadir la fecha de creación en el nombre del archivo
+    fecha_creacion = datetime.now().strftime("%Y-%m-%d")
+    base_nombre = f"{nombre}_{fecha_creacion}"
     # Crear la ruta completa para el archivo PDF dentro de la carpeta "informes"
-    pdf_file = os.path.join(carpeta_informes, f"{nombre}.pdf")
+    pdf_file = os.path.join(carpeta_informes, f"{base_nombre}.pdf")
     
+    # Comprobar si el archivo ya existe y agregar un número si es necesario
+    contador = 1
+    while os.path.exists(pdf_file):
+        pdf_file = os.path.join(carpeta_informes, f"{base_nombre}_({contador}).pdf")
+        contador += 1
+
     # Crear un documento PDF
     doc = SimpleDocTemplate(pdf_file, pagesize=A4)
     
