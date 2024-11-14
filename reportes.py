@@ -38,6 +38,30 @@ def generar_grafico_por_genero(datos):
     
     return buffer  # Retornar el gráfico como objeto de BytesIO
 
+def generar_grafico_por_rol(datos):
+    # Contar libros por género usando los datos del reporte específico
+    roles = {}
+    for item in datos:
+        rol = item[2]  # Tercer elemento en cada registro es el género
+        roles[rol] = roles.get(rol, 0) + 1
+
+    # Datos para el gráfico
+    labels = list(roles.keys())
+    data = list(roles.values())
+    
+    # Crear un gráfico de pastel
+    plt.figure(figsize=(6, 4))
+    plt.pie(data, labels=labels, autopct='%1.1f%%', startangle=140)
+    plt.axis('equal')  # Mantener la proporción circular
+
+    # Guardar el gráfico en un búfer
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plt.close()  # Cerrar el gráfico para liberar memoria
+    
+    return buffer  # Retornar el gráfico como objeto de BytesIO
+
 def mostrar_opciones_reportes(self):
     icon_image = PhotoImage(file="UTN_logo.png")
 
@@ -147,6 +171,15 @@ def mostrar_resultado(self, resultado, nombre, titulo):
         elements.append(Spacer(1, 12))
         
         grafico_buffer = generar_grafico_por_genero(datos)
+        elements.append(Image(grafico_buffer, width=400, height=250))
+        
+    # Agregar el gráfico solo si el reporte es "Libros más prestados"
+    if nombre == "usuarios con mas prestamos":
+        elements.append(Spacer(1, 12))
+        elements.append(Paragraph("Distribución de Libros por Roles", styles['Heading2']))
+        elements.append(Spacer(1, 12))
+        
+        grafico_buffer = generar_grafico_por_rol(datos)
         elements.append(Image(grafico_buffer, width=400, height=250))
     
     # Construir el documento con el título, tabla y, si corresponde, el gráfico
