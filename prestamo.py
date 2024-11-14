@@ -44,8 +44,10 @@ def mostrar_prestamos(self):
             
             if messagebox.askyesno("Confirmar devolución", f"¿Realizar devolución del libro {libro}?"):
                 try:
-                    actualizar_fecha_devolucion(prestamo_id, fecha_hoy)
+                    penalizacion = actualizar_fecha_devolucion(prestamo_id, fecha_hoy)
                     messagebox.showinfo("Éxito", "El libro ha sido devuelto.")
+                    if penalizacion > 0:
+                        messagebox.showinfo("Entrega tarde", f"Se debe cobrar una penalizacion de ${penalizacion}")
 
                     # Destruir la ventana actual y recargarla
                     ventana_prestamos.destroy()

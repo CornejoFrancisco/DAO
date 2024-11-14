@@ -180,7 +180,18 @@ def actualizar_fecha_devolucion(prestamo_id, fecha_hoy):
         """, (prestamo_id,))
         
         conexion.commit()
-    
+        
+        fecha_devolucion = datetime.strptime(prestamo[4], "%Y-%m-%d").date()
+        
+        # Calcular los días de retraso y la penalización si hay retraso
+        dias_retraso = (fecha_hoy - fecha_devolucion).days
+        
+        if dias_retraso > 0:
+            penalizacion = dias_retraso * 100
+            return penalizacion
+        else:
+            return 0
+        
     except Exception as e:
         print(f"Error al actualizar la fecha de devolución: {e}")
     
