@@ -1,16 +1,18 @@
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, PhotoImage
 from datetime import datetime
 from tkcalendar import Calendar 
 from clase import Prestamo
 from comun import *
 
 def mostrar_prestamos(self):
+    icon_image = PhotoImage(file="UTN_logo.png")  
     # Ventana para mostrar los préstamos
     ventana_prestamos = tk.Toplevel(self.root)
     ventana_prestamos.title("Mostrar préstamos")
     ventana_prestamos.minsize(1100, 320)
-    
+    ventana_prestamos.iconphoto(True,icon_image)
+
     ventana_prestamos.lift()
     ventana_prestamos.attributes("-topmost", True)
     ventana_prestamos.after(100, lambda: ventana_prestamos.attributes("-topmost", False)) 

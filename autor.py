@@ -1,15 +1,19 @@
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, PhotoImage
 from clase import Autor
 from comun import *
 
 def mostrar_autores(self):
+    icon_image = PhotoImage(file="UTN_logo.png")  
+
+
     # Limpiar el frame actual antes de mostrar los autores
     ventana_autores = tk.Toplevel(self.root)
     ventana_autores.title("Mostrar autor")
     ventana_autores.geometry("650x350") 
     ventana_autores.minsize(650, 350) 
     
+    ventana_autores.iconphoto(True, icon_image)
     # Hacer que la ventana este al frente
     ventana_autores.lift()
     ventana_autores.attributes("-topmost", True)
