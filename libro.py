@@ -1,16 +1,20 @@
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, PhotoImage
 from clase import Libro
 from comun import *
 from prestamo import registrar_prestamo
 
 def mostrar_libros(self):
+    
+    icon_image = PhotoImage(file="UTN_logo.png")  
     # Limpiar el frame actual antes de mostrar los libros
     ventana_libro = tk.Toplevel(self.root)
     ventana_libro.title("Mostrar libro")
     ventana_libro.geometry("650x350") 
     ventana_libro.minsize(1250, 350) 
     
+    ventana_libro.iconphoto(True, icon_image)
+
     # Hacer que la ventana este al frente
     ventana_libro.lift()
     ventana_libro.attributes("-topmost", True)
