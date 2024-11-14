@@ -9,7 +9,7 @@ def mostrar_libros(self):
     ventana_libro = tk.Toplevel(self.root)
     ventana_libro.title("Mostrar libro")
     ventana_libro.geometry("650x350") 
-    ventana_libro.minsize(650, 350) 
+    ventana_libro.minsize(1250, 350) 
     
     # Hacer que la ventana este al frente
     ventana_libro.lift()
