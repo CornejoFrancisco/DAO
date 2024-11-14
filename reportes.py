@@ -10,6 +10,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.platypus.tables import Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
+import os  # Importar el módulo os para gestionar rutas y crear carpetas
 
 def generar_grafico_por_genero(datos):
     # Contar libros por género usando los datos del reporte específico
@@ -84,8 +85,13 @@ def mostrar_usuarios_con_mas_prestamos(self):
     mostrar_resultado(self, report, "usuarios con mas prestamos", "Top 5 Usuarios con más préstamos")
 
 def mostrar_resultado(self, resultado, nombre, titulo):
-    # Crear un archivo PDF
-    pdf_file = nombre + ".pdf"
+    # Asegurarse de que la carpeta "informes" existe
+    carpeta_informes = "informes"
+    if not os.path.exists(carpeta_informes):
+        os.makedirs(carpeta_informes)
+
+    # Crear la ruta completa para el archivo PDF dentro de la carpeta "informes"
+    pdf_file = os.path.join(carpeta_informes, f"{nombre}.pdf")
     
     # Crear un documento PDF
     doc = SimpleDocTemplate(pdf_file, pagesize=A4)
