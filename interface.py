@@ -11,6 +11,7 @@ class BibliotecaApp:
         self.root = root
         self.root.title("Biblioteca - Gestion")
         self.root.geometry("800x600")
+        self.root.minsize(800, 600)
         
         # Crear botones de acciones
         self.create_buttons()

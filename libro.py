@@ -8,6 +8,8 @@ def mostrar_libros(self):
     # Limpiar el frame actual antes de mostrar los libros
     ventana_libro = tk.Toplevel(self.root)
     ventana_libro.title("Mostrar libro")
+    ventana_libro.geometry("650x350") 
+    ventana_libro.minsize(650, 350) 
     
     # Hacer que la ventana este al frente
     ventana_libro.lift()
@@ -15,9 +17,20 @@ def mostrar_libros(self):
     ventana_libro.after(100, lambda: ventana_libro.attributes("-topmost", False))
     
     # Crear la grilla para mostrar los libros
+    #columnas = ("ISBN", "Titulo", "Genero", "Anio publicacion", "Autor", "Ejemplares")
+    #tree = ttk.Treeview(ventana_libro, columns=columnas, show='headings')
+    #tree.pack(pady=20)
+
+    frame_tree = tk.Frame(ventana_libro)
+    frame_tree.pack(fill="both", expand=True, pady=20)
+    # Crear el Treeview con el scrollbar
     columnas = ("ISBN", "Titulo", "Genero", "Anio publicacion", "Autor", "Ejemplares")
-    tree = ttk.Treeview(ventana_libro, columns=columnas, show='headings')
-    tree.pack(pady=20)
+    tree = ttk.Treeview(frame_tree, columns=columnas, show='headings')
+    tree.pack(side="left", fill="both", expand=True)
+    
+    scrollbar = ttk.Scrollbar(frame_tree, orient="vertical", command=tree.yview)
+    tree.configure(yscroll=scrollbar.set)
+    scrollbar.pack(side="right", fill="y")
 
     for col in columnas:
         tree.heading(col, text=col)
@@ -83,6 +96,8 @@ def mostrar_libros(self):
 def registrar_libro(self, callback):
     ventana_libro = tk.Toplevel(self.root)
     ventana_libro.title("Registrar Libro")
+    ventana_libro.geometry("350x250") 
+    ventana_libro.minsize(350, 250) 
 
     tk.Label(ventana_libro, text="ISBN:").grid(row=0, column=0, padx=5, pady=5)
     isbn_entry = tk.Entry(ventana_libro)

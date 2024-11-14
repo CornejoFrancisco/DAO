@@ -7,6 +7,8 @@ def mostrar_autores(self):
     # Limpiar el frame actual antes de mostrar los autores
     ventana_autores = tk.Toplevel(self.root)
     ventana_autores.title("Mostrar autor")
+    ventana_autores.geometry("650x350") 
+    ventana_autores.minsize(650, 350) 
     
     # Hacer que la ventana este al frente
     ventana_autores.lift()
@@ -59,7 +61,8 @@ def mostrar_autores(self):
 def registrar_autor(self, actualizar_autores):
     ventana_autor = tk.Toplevel(self.root)
     ventana_autor.title("Registrar Autor")
-    ventana_autor.geometry("250x200")        
+    ventana_autor.geometry("250x200")
+    ventana_autor.minsize(250, 200)        
             
     tk.Label(ventana_autor, text="Nombre:").grid(row=0, column=0, padx=5, pady=5)
     nombre_entry = tk.Entry(ventana_autor)
